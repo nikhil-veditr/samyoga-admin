@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminCapabilitiesPanel } from "@/components/organisms/app-shell/admin-capabilities-panel";
 import { AdminHeader } from "@/components/organisms/app-shell/admin-header";
 import { AdminSidebar } from "@/components/organisms/app-shell/admin-sidebar";
 
@@ -31,7 +32,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <AdminHeader mobileNavOpen={mobileNavOpen} onOpenMobileSidebar={() => setMobileNavOpen(true)} />
-        <main className="app-scroll min-h-0 flex-1 p-4 md:p-6">{children}</main>
+        <div className="flex min-h-0 flex-1">
+          <main className="app-scroll min-h-0 min-w-0 flex-1 p-4 md:p-6">{children}</main>
+          <aside className="app-scroll-y hidden w-72 shrink-0 border-l border-border bg-card/40 p-4 xl:block">
+            <AdminCapabilitiesPanel variant="rail" />
+          </aside>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,159 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/atoms/button";
+import { TableCard } from "@/components/atoms/table-card";
+import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
+import {
+  useInternalTenantsQuery,
+  useUpdateTenantStatusMutation,
+} from "@/services/internal/internal.hooks";
+import type { InternalTenantSummary } from "@/services/internal/internal.types";
+
+type PendingTenantStatus = {
+  tenant: InternalTenantSummary;
+  nextStatus: "ACTIVE" | "INACTIVE";
+};
+
+export function TenantsPanel() {
+  const { data: tenants, isPending } = useInternalTenantsQuery();
+  const updateStatus = useUpdateTenantStatusMutation();
+  const [pending, setPending] = useState<PendingTenantStatus | null>(null);
+
+  const closeDialog = (): void => {
+    if (!updateStatus.isPending) setPending(null);
+  };
+
+  const confirmStatusChange = async (): Promise<void> => {
+    if (!pending) return;
+    await updateStatus.mutateAsync({
+      tenantId: pending.tenant.id,
+      status: pending.nextStatus,
+    });
+    setPending(null);
+  };
+
+  const deactivating = pending != null && pending.nextStatus === "INACTIVE";
+  const reactivating = pending != null && pending.nextStatus === "ACTIVE";
+
+  return (
+    <>
+      <TableCard shellClassName="p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-heading text-lg font-semibold text-foreground">All tenants</h2>
+            <p className="mt-1 text-sm text-muted">
+              Hospital workspaces on the platform. Deactivated tenants cannot sign in to HMS.
+            </p>
+          </div>
+          <Link href="/tenants/new">
+            <Button type="button">
+              <Plus className="mr-2 h-4 w-4" />
+              Provision tenant
+            </Button>
+          </Link>
+        </div>
+        {isPending ? (
+          <p className="text-sm text-muted">Loading tenants…</p>
+        ) : tenants && tenants.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border text-muted">
+                  <th className="py-2 pr-4 font-medium">Name</th>
+                  <th className="py-2 pr-4 font-medium">Slug</th>
+                  <th className="py-2 pr-4 font-medium">Status</th>
+                  <th className="py-2 font-medium">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tenants.map((t) => {
+                  const active = t.status === "ACTIVE";
+                  return (
+                    <tr key={t.id} className="border-b border-border/60 last:border-0">
+                      <td className="py-3 pr-4 font-medium text-foreground">{t.name}</td>
+                      <td className="py-3 pr-4 font-mono text-xs text-muted">{t.slug}</td>
+                      <td className="py-3 pr-4">
+                        <span
+                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+                            active ? "bg-primary/15 text-primary" : "bg-danger/10 text-danger"
+                          }`}
+                        >
+                          {t.status.toLowerCase()}
+                        </span>
+                      </td>
+                      <td className="py-3">
+                        {active ? (
+                          <Button
+                            type="button"
+                            variant="danger"
+                            className="px-3 py-1 text-xs"
+                            disabled={updateStatus.isPending}
+                            onClick={() => setPending({ tenant: t, nextStatus: "INACTIVE" })}
+                          >
+                            Deactivate
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="px-3 py-1 text-xs"
+                            disabled={updateStatus.isPending}
+                            onClick={() => setPending({ tenant: t, nextStatus: "ACTIVE" })}
+                          >
+                            Reactivate
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-muted">No tenants yet.</p>
+        )}
+      </TableCard>
+
+      <ConfirmDialog
+        open={deactivating}
+        onOpenChange={(open) => {
+          if (!open) closeDialog();
+        }}
+        title={`Deactivate ${pending?.tenant.name ?? "tenant"}?`}
+        description={
+          pending
+            ? `Members of ${pending.tenant.name} (${pending.tenant.slug}) will lose HMS access until you reactivate this workspace. Existing data is preserved.`
+            : undefined
+        }
+        confirmLabel="Deactivate tenant"
+        destructive
+        pending={updateStatus.isPending}
+        confirmNameMatch={pending?.tenant.slug}
+        confirmFieldKey={pending?.tenant.id}
+        onConfirm={confirmStatusChange}
+      />
+
+      <ConfirmDialog
+        open={reactivating}
+        onOpenChange={(open) => {
+          if (!open) closeDialog();
+        }}
+        title={`Reactivate ${pending?.tenant.name ?? "tenant"}?`}
+        description={
+          pending
+            ? `Restores HMS access for ${pending.tenant.name}. Members can sign in again if their accounts are still active.`
+            : undefined
+        }
+        confirmLabel="Reactivate tenant"
+        pending={updateStatus.isPending}
+        confirmNameMatch={pending?.tenant.slug}
+        confirmFieldKey={pending?.tenant.id}
+        onConfirm={confirmStatusChange}
+      />
+    </>
+  );
+}

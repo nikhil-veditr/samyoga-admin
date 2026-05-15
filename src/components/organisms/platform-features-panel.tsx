@@ -155,6 +155,7 @@ export function PlatformFeaturesPanel() {
         }
         confirmLabel="Enable platform-wide"
         pending={updateFeature.isPending}
+        confirmNameMatch={pending?.feature.name}
         confirmFieldKey={pending?.feature.name}
         onConfirm={confirmToggle}
       />

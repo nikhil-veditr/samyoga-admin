@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PanelLeftClose } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/shared/config/admin-nav";
+import { AdminCapabilitiesPanel } from "@/components/organisms/app-shell/admin-capabilities-panel";
 import { SamyogaLogoMark } from "@/components/atoms/samyoga-logo";
 import { ThemeCycleControl } from "@/components/molecules/theme-cycle-control";
 
@@ -73,6 +74,10 @@ export function AdminSidebar({ mobileOpen, onCloseMobile }: AdminSidebarProps) {
           );
         })}
       </nav>
+
+      <div className="xl:hidden">
+        <AdminCapabilitiesPanel variant="sidebar" onNavigate={onCloseMobile} />
+      </div>
 
       <div className="border-t border-border p-3">
         <ThemeCycleControl variant="sidebar" />

@@ -9,6 +9,7 @@ import {
   fetchInternalTenants,
   fetchPlatformFeatures,
   provisionInternalTenant,
+  updateInternalTenantStatus,
   updatePlatformFeature,
 } from "./internal.api";
 import type { ProvisionTenantPayload } from "./internal.types";
@@ -66,6 +67,21 @@ export function useInternalTenantsQuery() {
     queryFn: fetchInternalTenants,
     enabled,
     staleTime: 60_000,
+  });
+}
+
+export function useUpdateTenantStatusMutation() {
+  return useAppMutation({
+    mutationKey: ["internal", "tenants", "status"],
+    mutationFn: ({ tenantId, status }: { tenantId: string; status: "ACTIVE" | "INACTIVE" }) =>
+      updateInternalTenantStatus(tenantId, status),
+    onSuccess: async (_data, { status }) => {
+      await queryClient.invalidateQueries({ queryKey: internalTenantsQueryKey });
+      toast.success(status === "ACTIVE" ? "Tenant reactivated" : "Tenant deactivated");
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
   });
 }
 

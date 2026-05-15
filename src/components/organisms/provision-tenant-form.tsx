@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/atoms/button";
@@ -8,6 +9,7 @@ import { Checkbox } from "@/components/atoms/checkbox";
 import { Input } from "@/components/atoms/input";
 import { InlineFeedback } from "@/components/atoms/inline-feedback";
 import { TableCard } from "@/components/atoms/table-card";
+import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import {
   DEFAULT_PROVISION_FEATURES,
   FEATURE_LABELS,
@@ -43,6 +45,7 @@ function featureLabel(name: string): string {
 export function ProvisionTenantForm() {
   const router = useRouter();
   const provision = useProvisionTenantMutation();
+  const [pendingValues, setPendingValues] = useState<ProvisionFormValues | null>(null);
   const { data: catalogFeatures, isPending: featuresLoading } = useCatalogFeaturesQuery();
 
   const form = useZodForm<ProvisionFormValues>({
@@ -90,20 +93,28 @@ export function ProvisionTenantForm() {
     );
   };
 
-  const onSubmit = form.handleSubmit(async (values) => {
+  const onSubmit = form.handleSubmit((values) => {
+    setPendingValues(values);
+  });
+
+  const confirmProvision = async (): Promise<void> => {
+    if (!pendingValues) return;
     await provision.mutateAsync({
-      tenantName: values.tenantName,
-      tenantSlug: values.tenantSlug?.trim() || undefined,
-      address: values.address?.trim() || undefined,
-      featureNames: values.featureNames,
-      adminFirstName: values.adminFirstName,
-      adminLastName: values.adminLastName,
-      adminEmail: values.adminEmail,
-      adminPassword: values.adminPassword,
+      tenantName: pendingValues.tenantName,
+      tenantSlug: pendingValues.tenantSlug?.trim() || undefined,
+      address: pendingValues.address?.trim() || undefined,
+      featureNames: pendingValues.featureNames,
+      adminFirstName: pendingValues.adminFirstName,
+      adminLastName: pendingValues.adminLastName,
+      adminEmail: pendingValues.adminEmail,
+      adminPassword: pendingValues.adminPassword,
     });
+    setPendingValues(null);
     router.push("/tenants");
     router.refresh();
-  });
+  };
+
+  const confirmMatch = pendingValues?.tenantName.trim() ?? "";
 
   return (
     <div className="space-y-4">
@@ -258,6 +269,24 @@ export function ProvisionTenantForm() {
           </div>
         </form>
       </TableCard>
+
+      <ConfirmDialog
+        open={pendingValues != null}
+        onOpenChange={(open) => {
+          if (!open && !provision.isPending) setPendingValues(null);
+        }}
+        title="Provision this tenant?"
+        description={
+          pendingValues
+            ? `Creates ${pendingValues.tenantName.trim()} with ${pendingValues.featureNames.length} module(s) and admin ${pendingValues.adminEmail.trim()}. This cannot be undone from the portal except by deactivating the workspace.`
+            : undefined
+        }
+        confirmLabel="Create tenant"
+        pending={provision.isPending}
+        confirmNameMatch={confirmMatch}
+        confirmFieldKey={confirmMatch}
+        onConfirm={confirmProvision}
+      />
     </div>
   );
 }

@@ -44,6 +44,19 @@ export async function fetchInternalTenants(): Promise<InternalTenantSummary[]> {
   return data?.tenants ?? [];
 }
 
+export async function updateInternalTenantStatus(
+  tenantId: string,
+  status: "ACTIVE" | "INACTIVE",
+): Promise<InternalTenantSummary> {
+  const data = await fetchClient<{ tenant: InternalTenantSummary }>({
+    endpoint: `/internal/tenants/${encodeURIComponent(tenantId)}/status`,
+    method: "PATCH",
+    body: { status },
+  });
+  if (!data?.tenant) throw new Error("Failed to update tenant status");
+  return data.tenant;
+}
+
 export async function provisionInternalTenant(
   body: ProvisionTenantPayload,
 ): Promise<ProvisionTenantResult> {

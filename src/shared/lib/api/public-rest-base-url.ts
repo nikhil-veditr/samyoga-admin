@@ -13,7 +13,7 @@ function stripEdgeSlashes(value: string): string {
  *   Express (e.g. `https://api.samyoga.in/api/v1/...`). Session cookies must use a shared parent
  *   **`Domain`** on the API (`BETTER_AUTH_COOKIE_DOMAIN` on BE, e.g. `*.samyoga.in` → `.samyoga.in`).
  * - If unset → **`window.location.origin`** (same-origin proxy or local Next-only API).
- * - **Server / build:** Falls back to `http://localhost:3002` when no env domain is set (SSR/tests).
+ * - **Server / build:** Falls back to `http://localhost:3003` when no env domain is set (SSR/tests).
  * - **Version:** `NEXT_PUBLIC_API_VERSION` (default `api/v1`).
  */
 export function getPublicRestApiBaseUrl(): string {
@@ -29,6 +29,6 @@ export function getPublicRestApiBaseUrl(): string {
   }
 
   const domain =
-    explicit.length > 0 ? stripTrailingSlashes(explicit) : "http://localhost:3002";
+    explicit.length > 0 ? stripTrailingSlashes(explicit) : "http://localhost:3003";
   return `${domain}/${version}`;
 }

@@ -3,6 +3,7 @@ import { Inter, Montserrat } from "next/font/google";
 import Script from "next/script";
 import { AppProviders } from "@/shared/providers/app-providers";
 import { BRANDING } from "@/shared/config/branding";
+import { createRootMetadata } from "@/shared/config/site-metadata";
 import "./globals.css";
 
 const themeBootstrap = `
@@ -35,9 +36,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Samyoga Admin",
-  description: "Samyoga platform administration",
-  robots: { index: false, follow: false },
+  ...createRootMetadata(),
   icons: {
     icon: [{ url: BRANDING.logoMarkSvg, type: "image/svg+xml" }, { url: BRANDING.logoMarkRaster, type: "image/webp" }],
     apple: BRANDING.logoMarkRaster,

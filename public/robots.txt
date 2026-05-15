@@ -1,0 +1,15 @@
+# Internal tenant portal — disallow crawling and indexing signals for all bots (including Google).
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Googlebot-Image
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: *
+Disallow: /

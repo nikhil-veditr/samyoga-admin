@@ -6,6 +6,7 @@ export const FEATURE_NAMES = [
   "BILLING_AND_INVOICING",
   "ROLE_MANAGEMENT",
   "USER_MANAGEMENT",
+  "TENANT_MANAGEMENT",
   "CLINICAL_DOCUMENTS",
   "ADMISSIONS",
   "AUDIT_AND_COMPLIANCE",
@@ -20,6 +21,7 @@ export const FEATURE_LABELS: Record<CatalogFeatureName, string> = {
   BILLING_AND_INVOICING: "Billing & invoicing",
   ROLE_MANAGEMENT: "Role management",
   USER_MANAGEMENT: "User management",
+  TENANT_MANAGEMENT: "Workspace settings",
   CLINICAL_DOCUMENTS: "Clinical documents",
   ADMISSIONS: "Admissions",
   AUDIT_AND_COMPLIANCE: "Audit & compliance",
@@ -28,6 +30,7 @@ export const FEATURE_LABELS: Record<CatalogFeatureName, string> = {
 /** Sensible defaults when provisioning a new hospital workspace. */
 export const DEFAULT_PROVISION_FEATURES: CatalogFeatureName[] = [
   "USER_MANAGEMENT",
+  "TENANT_MANAGEMENT",
   "ROLE_MANAGEMENT",
   "LAB_MANAGEMENT",
   "PATIENT_RECORDS",

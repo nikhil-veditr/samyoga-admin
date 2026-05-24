@@ -5,6 +5,16 @@ export type InternalTenantSummary = {
   status: string;
 };
 
+export type InternalTenantFeature = CatalogFeature & {
+  isPlatformActive: boolean;
+  isEnabled: boolean;
+};
+
+export type InternalTenantFeaturesPayload = {
+  tenant: InternalTenantSummary;
+  features: InternalTenantFeature[];
+};
+
 export type CatalogFeature = {
   name: string;
   description: string | null;

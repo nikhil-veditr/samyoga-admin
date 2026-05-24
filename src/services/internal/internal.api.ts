@@ -1,6 +1,7 @@
 import { fetchClient } from "@/shared/lib/fetch/fetch-client";
 import type {
   CatalogFeature,
+  InternalTenantFeaturesPayload,
   InternalTenantSummary,
   PlatformFeature,
   ProvisionTenantPayload,
@@ -55,6 +56,30 @@ export async function updateInternalTenantStatus(
   });
   if (!data?.tenant) throw new Error("Failed to update tenant status");
   return data.tenant;
+}
+
+export async function fetchInternalTenantFeatures(
+  tenantId: string,
+): Promise<InternalTenantFeaturesPayload> {
+  const data = await fetchClient<InternalTenantFeaturesPayload>({
+    endpoint: `/internal/tenants/${encodeURIComponent(tenantId)}/features`,
+    silent: true,
+  });
+  if (!data?.tenant || !data.features) throw new Error("Failed to load tenant modules");
+  return data;
+}
+
+export async function updateInternalTenantFeatures(
+  tenantId: string,
+  features: { name: string; isEnabled: boolean }[],
+): Promise<InternalTenantFeaturesPayload> {
+  const data = await fetchClient<InternalTenantFeaturesPayload>({
+    endpoint: `/internal/tenants/${encodeURIComponent(tenantId)}/features`,
+    method: "PATCH",
+    body: { features },
+  });
+  if (!data?.tenant || !data.features) throw new Error("Failed to update tenant modules");
+  return data;
 }
 
 export async function provisionInternalTenant(

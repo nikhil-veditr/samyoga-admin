@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useLayoutEffect, useState } from "react";
+import { useId, useLayoutEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/atoms/button";
 import { Modal } from "@/components/atoms/modal";
 
@@ -51,6 +51,8 @@ export type ConfirmDialogProps = {
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
+  /** Optional content below the description (links, notes). */
+  children?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   onConfirm: () => void | Promise<void>;
@@ -78,6 +80,7 @@ export function ConfirmDialog({
   pending = false,
   confirmNameMatch,
   confirmFieldKey,
+  children,
 }: ConfirmDialogProps) {
   const titleId = useId();
   const descId = useId();
@@ -132,6 +135,7 @@ export function ConfirmDialog({
           {description}
         </p>
       ) : null}
+      {children}
       {open && confirmNameMatch ? (
         <ConfirmNameMatchInput
           key={confirmFieldKey ?? "confirm-name"}

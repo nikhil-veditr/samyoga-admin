@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
+import { TenantFeaturesDialog } from "@/components/organisms/tenant-features-dialog";
 import {
   useInternalTenantsQuery,
   useUpdateTenantStatusMutation,
@@ -21,6 +22,7 @@ export function TenantsPanel() {
   const { data: tenants, isPending } = useInternalTenantsQuery();
   const updateStatus = useUpdateTenantStatusMutation();
   const [pending, setPending] = useState<PendingTenantStatus | null>(null);
+  const [featuresTenant, setFeaturesTenant] = useState<InternalTenantSummary | null>(null);
 
   const closeDialog = (): void => {
     if (!updateStatus.isPending) setPending(null);
@@ -65,7 +67,7 @@ export function TenantsPanel() {
                   <th className="py-2 pr-4 font-medium">Name</th>
                   <th className="py-2 pr-4 font-medium">Slug</th>
                   <th className="py-2 pr-4 font-medium">Status</th>
-                  <th className="py-2 font-medium">Action</th>
+                  <th className="py-2 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,27 +87,38 @@ export function TenantsPanel() {
                         </span>
                       </td>
                       <td className="py-3">
-                        {active ? (
-                          <Button
-                            type="button"
-                            variant="danger"
-                            className="px-3 py-1 text-xs"
-                            disabled={updateStatus.isPending}
-                            onClick={() => setPending({ tenant: t, nextStatus: "INACTIVE" })}
-                          >
-                            Deactivate
-                          </Button>
-                        ) : (
+                        <div className="flex flex-wrap gap-2">
                           <Button
                             type="button"
                             variant="ghost"
                             className="px-3 py-1 text-xs"
                             disabled={updateStatus.isPending}
-                            onClick={() => setPending({ tenant: t, nextStatus: "ACTIVE" })}
+                            onClick={() => setFeaturesTenant(t)}
                           >
-                            Reactivate
+                            Modules
                           </Button>
-                        )}
+                          {active ? (
+                            <Button
+                              type="button"
+                              variant="danger"
+                              className="px-3 py-1 text-xs"
+                              disabled={updateStatus.isPending}
+                              onClick={() => setPending({ tenant: t, nextStatus: "INACTIVE" })}
+                            >
+                              Deactivate
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="px-3 py-1 text-xs"
+                              disabled={updateStatus.isPending}
+                              onClick={() => setPending({ tenant: t, nextStatus: "ACTIVE" })}
+                            >
+                              Reactivate
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -117,6 +130,14 @@ export function TenantsPanel() {
           <p className="text-sm text-muted">No tenants yet.</p>
         )}
       </TableCard>
+
+      <TenantFeaturesDialog
+        tenant={featuresTenant}
+        open={featuresTenant != null}
+        onOpenChange={(open) => {
+          if (!open) setFeaturesTenant(null);
+        }}
+      />
 
       <ConfirmDialog
         open={deactivating}

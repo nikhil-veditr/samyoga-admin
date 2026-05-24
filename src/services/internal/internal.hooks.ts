@@ -6,9 +6,11 @@ import { useAppMutation, useAppQuery } from "@/shared/lib/react-query/hooks";
 import { queryClient } from "@/shared/lib/react-query/query-client";
 import {
   fetchCatalogFeatures,
+  fetchInternalTenantFeatures,
   fetchInternalTenants,
   fetchPlatformFeatures,
   provisionInternalTenant,
+  updateInternalTenantFeatures,
   updateInternalTenantStatus,
   updatePlatformFeature,
 } from "./internal.api";
@@ -17,6 +19,8 @@ import type { ProvisionTenantPayload } from "./internal.types";
 export const internalCatalogFeaturesQueryKey = ["internal", "features", "catalog"] as const;
 export const internalPlatformFeaturesQueryKey = ["internal", "features", "platform"] as const;
 export const internalTenantsQueryKey = ["internal", "tenants"] as const;
+export const internalTenantFeaturesQueryKey = (tenantId: string) =>
+  ["internal", "tenants", tenantId, "features"] as const;
 
 export function useCatalogFeaturesQuery() {
   const { data: sessionData, isPending: sessionPending } = authClient.useSession();
@@ -67,6 +71,38 @@ export function useInternalTenantsQuery() {
     queryFn: fetchInternalTenants,
     enabled,
     staleTime: 60_000,
+  });
+}
+
+export function useInternalTenantFeaturesQuery(tenantId: string | null, dialogOpen: boolean) {
+  const { data: sessionData, isPending: sessionPending } = authClient.useSession();
+  const enabled = Boolean(!sessionPending && sessionData?.user && tenantId && dialogOpen);
+
+  return useAppQuery({
+    queryKey: internalTenantFeaturesQueryKey(tenantId ?? "none"),
+    queryFn: () => fetchInternalTenantFeatures(tenantId!),
+    enabled,
+  });
+}
+
+export function useUpdateInternalTenantFeaturesMutation() {
+  return useAppMutation({
+    mutationKey: ["internal", "tenants", "features", "update"],
+    mutationFn: ({
+      tenantId,
+      features,
+    }: {
+      tenantId: string;
+      features: { name: string; isEnabled: boolean }[];
+    }) => updateInternalTenantFeatures(tenantId, features),
+    onSuccess: async (_data, { tenantId }) => {
+      await queryClient.invalidateQueries({ queryKey: internalTenantFeaturesQueryKey(tenantId) });
+      await queryClient.invalidateQueries({ queryKey: internalPlatformFeaturesQueryKey });
+      toast.success("Tenant modules updated");
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
   });
 }
 

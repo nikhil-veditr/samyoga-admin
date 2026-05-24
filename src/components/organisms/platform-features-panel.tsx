@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
@@ -131,7 +132,7 @@ export function PlatformFeaturesPanel() {
         title={`Disable ${pending ? featureLabel(pending.feature.name) : "feature"}?`}
         description={
           pending
-            ? `This immediately blocks every HMS API that requires ${featureLabel(pending.feature.name)} for all tenants. ${pending.feature.enabledTenantCount} tenant(s) currently have this module enabled in their workspace — those assignments stay, but API permission checks will fail until you re-enable the feature.`
+            ? `This immediately blocks every HMS API that requires ${featureLabel(pending.feature.name)} for all tenants. ${pending.feature.enabledTenantCount} tenant(s) currently have this module enabled in their workspace — those assignments stay, but API permission checks will fail until you re-enable the feature. Review affected tenants on the tenants page and adjust modules if needed.`
             : undefined
         }
         confirmLabel="Disable platform-wide"
@@ -140,7 +141,16 @@ export function PlatformFeaturesPanel() {
         confirmNameMatch={pending?.feature.name}
         confirmFieldKey={pending?.feature.name}
         onConfirm={confirmToggle}
-      />
+      >
+        {pending && pending.feature.enabledTenantCount > 0 ? (
+          <Link
+            href="/tenants"
+            className="mt-3 inline-flex text-sm font-medium text-primary underline underline-offset-2 hover:text-primary/90"
+          >
+            Open tenants list ({pending.feature.enabledTenantCount} with this module enabled)
+          </Link>
+        ) : null}
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={enabling}

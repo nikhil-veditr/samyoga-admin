@@ -42,3 +42,13 @@ export type ProvisionTenantResult = {
   adminUserId: string;
   adminEmail: string;
 };
+
+export type TenantAccessPolicy = {
+  enforcePhiMinimumNecessary: boolean;
+  defaultSessionTtlMinutes: number | null;
+  allowedIpCidrs: string | null;
+};
+
+export type InternalTenantSettingsPayload = {
+  settings: TenantAccessPolicy;
+};

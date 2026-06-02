@@ -7,20 +7,23 @@ import { queryClient } from "@/shared/lib/react-query/query-client";
 import {
   fetchCatalogFeatures,
   fetchInternalTenantFeatures,
+  fetchInternalTenantSettings,
   fetchInternalTenants,
   fetchPlatformFeatures,
   provisionInternalTenant,
   updateInternalTenantFeatures,
+  updateInternalTenantSettings,
   updateInternalTenantStatus,
   updatePlatformFeature,
 } from "./internal.api";
-import type { ProvisionTenantPayload } from "./internal.types";
-
+import type { ProvisionTenantPayload, TenantAccessPolicy } from "./internal.types";
 export const internalCatalogFeaturesQueryKey = ["internal", "features", "catalog"] as const;
 export const internalPlatformFeaturesQueryKey = ["internal", "features", "platform"] as const;
 export const internalTenantsQueryKey = ["internal", "tenants"] as const;
 export const internalTenantFeaturesQueryKey = (tenantId: string) =>
   ["internal", "tenants", tenantId, "features"] as const;
+export const internalTenantSettingsQueryKey = (tenantId: string) =>
+  ["internal", "tenants", tenantId, "settings"] as const;
 
 export function useCatalogFeaturesQuery() {
   const { data: sessionData, isPending: sessionPending } = authClient.useSession();
@@ -114,6 +117,37 @@ export function useUpdateTenantStatusMutation() {
     onSuccess: async (_data, { status }) => {
       await queryClient.invalidateQueries({ queryKey: internalTenantsQueryKey });
       toast.success(status === "ACTIVE" ? "Tenant reactivated" : "Tenant deactivated");
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+}
+
+export function useInternalTenantSettingsQuery(tenantId: string | null, dialogOpen: boolean) {
+  const { data: sessionData, isPending: sessionPending } = authClient.useSession();
+  const enabled = Boolean(!sessionPending && sessionData?.user && tenantId && dialogOpen);
+
+  return useAppQuery({
+    queryKey: internalTenantSettingsQueryKey(tenantId ?? ""),
+    queryFn: () => fetchInternalTenantSettings(tenantId!),
+    enabled,
+    staleTime: 30_000,
+  });
+}
+
+export function useUpdateInternalTenantSettingsMutation() {
+  return useAppMutation({
+    mutationKey: ["internal", "tenants", "settings"],
+    mutationFn: ({
+      tenantId,
+      body,
+    }: {
+      tenantId: string;
+      body: Partial<TenantAccessPolicy>;
+    }) => updateInternalTenantSettings(tenantId, body),
+    onSuccess: async (_data, { tenantId }) => {
+      await queryClient.invalidateQueries({ queryKey: internalTenantSettingsQueryKey(tenantId) });
     },
     onError: (err: Error) => {
       toast.error(err.message);

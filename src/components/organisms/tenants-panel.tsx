@@ -7,6 +7,7 @@ import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { TenantFeaturesDialog } from "@/components/organisms/tenant-features-dialog";
+import { TenantPolicyDialog } from "@/components/organisms/tenant-policy-dialog";
 import {
   useInternalTenantsQuery,
   useUpdateTenantStatusMutation,
@@ -23,6 +24,7 @@ export function TenantsPanel() {
   const updateStatus = useUpdateTenantStatusMutation();
   const [pending, setPending] = useState<PendingTenantStatus | null>(null);
   const [featuresTenant, setFeaturesTenant] = useState<InternalTenantSummary | null>(null);
+  const [policyTenant, setPolicyTenant] = useState<InternalTenantSummary | null>(null);
 
   const closeDialog = (): void => {
     if (!updateStatus.isPending) setPending(null);
@@ -97,6 +99,15 @@ export function TenantsPanel() {
                           >
                             Modules
                           </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="px-3 py-1 text-xs"
+                            disabled={updateStatus.isPending}
+                            onClick={() => setPolicyTenant(t)}
+                          >
+                            Policy
+                          </Button>
                           {active ? (
                             <Button
                               type="button"
@@ -156,6 +167,14 @@ export function TenantsPanel() {
         confirmNameMatch={pending?.tenant.slug}
         confirmFieldKey={pending?.tenant.id}
         onConfirm={confirmStatusChange}
+      />
+
+      <TenantPolicyDialog
+        tenant={policyTenant}
+        open={policyTenant != null}
+        onOpenChange={(open) => {
+          if (!open) setPolicyTenant(null);
+        }}
       />
 
       <ConfirmDialog

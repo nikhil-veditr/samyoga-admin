@@ -2,10 +2,12 @@ import { fetchClient } from "@/shared/lib/fetch/fetch-client";
 import type {
   CatalogFeature,
   InternalTenantFeaturesPayload,
+  InternalTenantSettingsPayload,
   InternalTenantSummary,
   PlatformFeature,
   ProvisionTenantPayload,
   ProvisionTenantResult,
+  TenantAccessPolicy,
 } from "./internal.types";
 
 export async function fetchCatalogFeatures(): Promise<CatalogFeature[]> {
@@ -79,6 +81,30 @@ export async function updateInternalTenantFeatures(
     body: { features },
   });
   if (!data?.tenant || !data.features) throw new Error("Failed to update tenant modules");
+  return data;
+}
+
+export async function fetchInternalTenantSettings(
+  tenantId: string,
+): Promise<InternalTenantSettingsPayload> {
+  const data = await fetchClient<InternalTenantSettingsPayload>({
+    endpoint: `/internal/tenants/${encodeURIComponent(tenantId)}/settings`,
+    silent: true,
+  });
+  if (!data?.settings) throw new Error("Failed to load tenant policy");
+  return data;
+}
+
+export async function updateInternalTenantSettings(
+  tenantId: string,
+  body: Partial<TenantAccessPolicy>,
+): Promise<InternalTenantSettingsPayload> {
+  const data = await fetchClient<InternalTenantSettingsPayload>({
+    endpoint: `/internal/tenants/${encodeURIComponent(tenantId)}/settings`,
+    method: "PATCH",
+    body,
+  });
+  if (!data?.settings) throw new Error("Failed to update tenant policy");
   return data;
 }
 

@@ -47,6 +47,8 @@ export type TenantAccessPolicy = {
   enforcePhiMinimumNecessary: boolean;
   defaultSessionTtlMinutes: number | null;
   allowedIpCidrs: string | null;
+  requireTwoFactor: boolean;
+  requireTwoFactorEnforceAt: string | null;
 };
 
 export type InternalTenantSettingsPayload = {

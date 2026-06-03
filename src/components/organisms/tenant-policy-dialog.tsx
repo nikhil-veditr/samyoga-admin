@@ -13,6 +13,21 @@ import {
 } from "@/services/internal/internal.hooks";
 import type { InternalTenantSummary, TenantAccessPolicy } from "@/services/internal/internal.types";
 
+function defaultEnforceDateInput(): string {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() + 14);
+  return date.toISOString().slice(0, 10);
+}
+
+function toDateInputValue(iso: string | null | undefined): string {
+  if (!iso) return defaultEnforceDateInput();
+  return iso.slice(0, 10);
+}
+
+function toEnforceAtIso(dateInput: string): string {
+  return `${dateInput}T23:59:59.999Z`;
+}
+
 type TenantPolicyDialogProps = {
   tenant: InternalTenantSummary | null;
   open: boolean;
@@ -25,10 +40,12 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
   const updateSettings = useUpdateInternalTenantSettingsMutation();
 
   const [draft, setDraft] = useState<TenantAccessPolicy | null>(null);
+  const [enforceDateInput, setEnforceDateInput] = useState(defaultEnforceDateInput);
 
   useEffect(() => {
     if (data?.settings) {
       setDraft(data.settings);
+      setEnforceDateInput(toDateInputValue(data.settings.requireTwoFactorEnforceAt));
     }
   }, [data?.settings]);
 
@@ -46,6 +63,10 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
         enforcePhiMinimumNecessary: draft.enforcePhiMinimumNecessary,
         defaultSessionTtlMinutes: draft.defaultSessionTtlMinutes,
         allowedIpCidrs: draft.allowedIpCidrs,
+        requireTwoFactor: draft.requireTwoFactor,
+        requireTwoFactorEnforceAt: draft.requireTwoFactor
+          ? toEnforceAtIso(enforceDateInput)
+          : null,
       },
     });
     toast.success("Compliance settings updated");
@@ -142,6 +163,37 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
             <p className="text-xs text-muted">
               Comma-separated list. Empty allows all IPs (subject to HMS network controls).
             </p>
+          </div>
+          <div className="space-y-3 rounded-xl border border-border/60 p-3">
+            <Checkbox
+              checked={draft.requireTwoFactor}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setDraft((prev) => (prev ? { ...prev, requireTwoFactor: checked } : prev));
+                if (checked && !draft.requireTwoFactorEnforceAt) {
+                  setEnforceDateInput(defaultEnforceDateInput());
+                }
+              }}
+            >
+              Require passkey or authenticator (2FA)
+            </Checkbox>
+            {draft.requireTwoFactor ? (
+              <div className="space-y-1.5 pl-6">
+                <label htmlFor="two-factor-enforce-date" className="text-sm font-medium text-foreground">
+                  Enforcement date
+                </label>
+                <Input
+                  id="two-factor-enforce-date"
+                  type="date"
+                  value={enforceDateInput}
+                  onChange={(e) => setEnforceDateInput(e.target.value)}
+                />
+                <p className="text-xs text-muted">
+                  Until this date, members see a reminder banner. After it, editing patient and clinical
+                  records is blocked until they add a passkey or turn on authenticator 2FA.
+                </p>
+              </div>
+            ) : null}
           </div>
         </div>
       )}

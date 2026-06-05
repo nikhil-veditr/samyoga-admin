@@ -68,6 +68,7 @@ export function TenantsPanel() {
                 <tr className="border-b border-border text-muted">
                   <th className="py-2 pr-4 font-medium">Name</th>
                   <th className="py-2 pr-4 font-medium">Slug</th>
+                  <th className="py-2 pr-4 font-medium">Region</th>
                   <th className="py-2 pr-4 font-medium">Status</th>
                   <th className="py-2 font-medium">Actions</th>
                 </tr>
@@ -79,6 +80,7 @@ export function TenantsPanel() {
                     <tr key={t.id} className="border-b border-border/60 last:border-0">
                       <td className="py-3 pr-4 font-medium text-foreground">{t.name}</td>
                       <td className="py-3 pr-4 font-mono text-xs text-muted">{t.slug}</td>
+                      <td className="py-3 pr-4 text-muted">{t.region === "AU" ? "Australia" : "India"}</td>
                       <td className="py-3 pr-4">
                         <span
                           className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${

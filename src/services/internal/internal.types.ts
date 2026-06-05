@@ -3,6 +3,7 @@ export type InternalTenantSummary = {
   name: string;
   slug: string;
   status: string;
+  region: "IN" | "AU";
 };
 
 export type InternalTenantFeature = CatalogFeature & {

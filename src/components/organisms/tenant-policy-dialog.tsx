@@ -19,6 +19,18 @@ function defaultEnforceDateInput(): string {
   return date.toISOString().slice(0, 10);
 }
 
+function enforceDateFromGraceDays(days: number): string {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+const GRACE_PERIOD_PRESETS = [
+  { label: "7 days", days: 7 },
+  { label: "14 days", days: 14 },
+  { label: "30 days", days: 30 },
+] as const;
+
 function toDateInputValue(iso: string | null | undefined): string {
   if (!iso) return defaultEnforceDateInput();
   return iso.slice(0, 10);
@@ -182,6 +194,20 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
                 <label htmlFor="two-factor-enforce-date" className="text-sm font-medium text-foreground">
                   Enforcement date
                 </label>
+                <div className="flex flex-wrap gap-2">
+                  {GRACE_PERIOD_PRESETS.map((preset) => (
+                    <Button
+                      key={preset.days}
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="h-8"
+                      onClick={() => setEnforceDateInput(enforceDateFromGraceDays(preset.days))}
+                    >
+                      {preset.label}
+                    </Button>
+                  ))}
+                </div>
                 <Input
                   id="two-factor-enforce-date"
                   type="date"
@@ -189,8 +215,8 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
                   onChange={(e) => setEnforceDateInput(e.target.value)}
                 />
                 <p className="text-xs text-muted">
-                  Until this date, members see a reminder banner. After it, editing patient and clinical
-                  records is blocked until they add a passkey or turn on authenticator 2FA.
+                  Until this date, members see a reminder banner in HMS. After it, editing patient and
+                  clinical records is blocked until they add a passkey or turn on authenticator 2FA.
                 </p>
               </div>
             ) : null}

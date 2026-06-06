@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Building2, LayoutDashboard, PlusCircle, Puzzle } from "lucide-react";
+import { Building2, LayoutDashboard, MessageSquare, PlusCircle, Puzzle } from "lucide-react";
 
 export type AdminCapabilityRisk = "read" | "write" | "critical";
 
@@ -64,6 +64,15 @@ export const SUPER_ADMIN_CAPABILITY_GROUPS: { title: string; items: AdminCapabil
         risk: "critical",
         requiresConfirmation: true,
       },
+      {
+        id: "feedback-triage",
+        label: "User feedback",
+        description: "Review HMS user reports and update triage status",
+        href: "/feedback",
+        icon: MessageSquare,
+        risk: "write",
+        requiresConfirmation: false,
+      },
     ],
   },
 ];
@@ -74,6 +83,7 @@ export function capabilitiesForPath(pathname: string): AdminCapability[] {
   return ALL_SUPER_ADMIN_CAPABILITIES.filter((cap) => {
     if (cap.href === "/") return pathname === "/" || pathname === "";
     if (cap.href === "/tenants") return pathname === "/tenants";
+    if (cap.href === "/feedback") return pathname === "/feedback";
     return pathname === cap.href || pathname.startsWith(`${cap.href}/`);
   });
 }

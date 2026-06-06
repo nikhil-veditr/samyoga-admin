@@ -56,3 +56,52 @@ export type TenantAccessPolicy = {
 export type InternalTenantSettingsPayload = {
   settings: TenantAccessPolicy;
 };
+
+export type UserFeedbackCategory =
+  | "GENERAL"
+  | "BUG"
+  | "LAB_REPORT"
+  | "PRINT"
+  | "PATIENTS"
+  | "APPOINTMENTS"
+  | "CLINICAL_DOCUMENTS"
+  | "OTHER";
+
+export type UserFeedbackSeverity = "BLOCKER" | "ANNOYANCE" | "NICE_TO_HAVE";
+
+export type UserFeedbackStatus =
+  | "OPEN"
+  | "IN_PROGRESS"
+  | "FIXED"
+  | "WONT_FIX"
+  | "CLOSED";
+
+export type InternalUserFeedbackItem = {
+  id: string;
+  tenantId: string;
+  tenantName: string;
+  tenantSlug: string;
+  reporterUserId: string;
+  reporterEmail: string;
+  reporterName: string | null;
+  category: UserFeedbackCategory;
+  severity: UserFeedbackSeverity;
+  status: UserFeedbackStatus;
+  summary: string;
+  details: string | null;
+  context: Record<string, unknown> | null;
+  adminNotes: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type InternalUserFeedbackListPayload = {
+  items: InternalUserFeedbackItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};

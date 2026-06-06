@@ -4,6 +4,8 @@ import type {
   InternalTenantFeaturesPayload,
   InternalTenantSettingsPayload,
   InternalTenantSummary,
+  InternalUserFeedbackItem,
+  InternalUserFeedbackListPayload,
   PlatformFeature,
   ProvisionTenantPayload,
   ProvisionTenantResult,
@@ -117,5 +119,41 @@ export async function provisionInternalTenant(
     body,
   });
   if (!data) throw new Error("Provisioning failed");
+  return data;
+}
+
+export async function fetchInternalUserFeedback(params?: {
+  status?: string;
+  tenantId?: string;
+  page?: number;
+}): Promise<InternalUserFeedbackListPayload> {
+  const query: Record<string, string> = {};
+  if (params?.status) query.status = params.status;
+  if (params?.tenantId) query.tenantId = params.tenantId;
+  if (params?.page) query.page = String(params.page);
+
+  const data = await fetchClient<InternalUserFeedbackListPayload>({
+    endpoint: "/internal/feedback",
+    query: Object.keys(query).length > 0 ? query : undefined,
+    silent: true,
+  });
+  return (
+    data ?? {
+      items: [],
+      pagination: { page: 1, limit: 25, total: 0, totalPages: 1 },
+    }
+  );
+}
+
+export async function updateInternalUserFeedback(
+  id: string,
+  body: { status?: string; adminNotes?: string | null },
+): Promise<InternalUserFeedbackItem> {
+  const data = await fetchClient<InternalUserFeedbackItem>({
+    endpoint: `/internal/feedback/${encodeURIComponent(id)}`,
+    method: "PATCH",
+    body,
+  });
+  if (!data) throw new Error("Failed to update feedback");
   return data;
 }

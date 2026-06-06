@@ -9,14 +9,16 @@ import {
   fetchInternalTenantFeatures,
   fetchInternalTenantSettings,
   fetchInternalTenants,
+  fetchInternalUserFeedback,
   fetchPlatformFeatures,
   provisionInternalTenant,
   updateInternalTenantFeatures,
   updateInternalTenantSettings,
   updateInternalTenantStatus,
+  updateInternalUserFeedback,
   updatePlatformFeature,
 } from "./internal.api";
-import type { ProvisionTenantPayload, TenantAccessPolicy } from "./internal.types";
+import type { ProvisionTenantPayload, TenantAccessPolicy, UserFeedbackStatus } from "./internal.types";
 export const internalCatalogFeaturesQueryKey = ["internal", "features", "catalog"] as const;
 export const internalPlatformFeaturesQueryKey = ["internal", "features", "platform"] as const;
 export const internalTenantsQueryKey = ["internal", "tenants"] as const;
@@ -161,6 +163,52 @@ export function useProvisionTenantMutation() {
     mutationFn: (body: ProvisionTenantPayload) => provisionInternalTenant(body),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: internalTenantsQueryKey });
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+}
+
+export const internalUserFeedbackQueryKey = (filters: {
+  status?: UserFeedbackStatus;
+  page: number;
+}) => ["internal", "feedback", filters] as const;
+
+export function useInternalUserFeedbackQuery(filters: {
+  status?: UserFeedbackStatus;
+  page: number;
+}) {
+  const { data: sessionData, isPending: sessionPending } = authClient.useSession();
+  const enabled = Boolean(!sessionPending && sessionData?.user);
+
+  return useAppQuery({
+    queryKey: internalUserFeedbackQueryKey(filters),
+    queryFn: () =>
+      fetchInternalUserFeedback({
+        status: filters.status,
+        page: filters.page,
+      }),
+    enabled,
+    staleTime: 30_000,
+  });
+}
+
+export function useUpdateInternalUserFeedbackMutation() {
+  return useAppMutation({
+    mutationKey: ["internal", "feedback", "update"],
+    mutationFn: ({
+      id,
+      status,
+      adminNotes,
+    }: {
+      id: string;
+      status?: UserFeedbackStatus;
+      adminNotes?: string | null;
+    }) => updateInternalUserFeedback(id, { status, adminNotes }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["internal", "feedback"] });
+      toast.success("Feedback updated");
     },
     onError: (err: Error) => {
       toast.error(err.message);

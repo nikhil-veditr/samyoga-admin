@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Building2, LayoutDashboard, PlusCircle, Puzzle } from "lucide-react";
+import { Building2, LayoutDashboard, MessageSquare, PlusCircle, Puzzle } from "lucide-react";
 
 export type AdminNavItem = {
   href: string;
@@ -33,6 +33,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     icon: PlusCircle,
     description: "Create hospital + admin user",
   },
+  {
+    href: "/feedback",
+    label: "Feedback",
+    icon: MessageSquare,
+    description: "User-reported issues from HMS workspaces",
+  },
 ];
 
 export function titleForAdminPath(pathname: string): string {
@@ -40,5 +46,6 @@ export function titleForAdminPath(pathname: string): string {
   if (pathname === "/features") return "Features";
   if (pathname === "/tenants") return "Tenants";
   if (pathname.startsWith("/tenants/new")) return "Provision tenant";
+  if (pathname === "/feedback") return "Feedback";
   return "Samyoga Admin";
 }

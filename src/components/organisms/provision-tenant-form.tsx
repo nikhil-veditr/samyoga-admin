@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
 import { Input } from "@/components/atoms/input";
+import { SelectField, type SelectOption } from "@/components/atoms/select-field";
 import { InlineFeedback } from "@/components/atoms/inline-feedback";
 import { TableCard } from "@/components/atoms/table-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
@@ -19,6 +20,11 @@ import { fieldSchemas } from "@/shared/lib/form/field-schemas";
 import { useZodForm } from "@/shared/lib/form/zod-form";
 import { useCatalogFeaturesQuery, useProvisionTenantMutation } from "@/services/internal/internal.hooks";
 
+const REGION_OPTIONS: SelectOption[] = [
+  { value: "IN", label: "India (IN)" },
+  { value: "AU", label: "Australia (AU)" },
+];
+
 const provisionSchema = z.object({
   tenantName: z.string().trim().min(2, "Hospital name is required"),
   tenantSlug: z
@@ -29,6 +35,7 @@ const provisionSchema = z.object({
       message: "Slug: lowercase letters, numbers, hyphens only",
     }),
   address: z.string().trim().optional(),
+  region: z.enum(["IN", "AU"]),
   featureNames: z.array(z.string()).min(1, "Select at least one feature"),
   adminFirstName: z.string().trim().min(1, "First name is required"),
   adminLastName: z.string().trim().min(1, "Last name is required"),
@@ -54,6 +61,7 @@ export function ProvisionTenantForm() {
       tenantName: "",
       tenantSlug: "",
       address: "",
+      region: "IN",
       featureNames: [...DEFAULT_PROVISION_FEATURES],
       adminFirstName: "",
       adminLastName: "",
@@ -103,6 +111,7 @@ export function ProvisionTenantForm() {
       tenantName: pendingValues.tenantName,
       tenantSlug: pendingValues.tenantSlug?.trim() || undefined,
       address: pendingValues.address?.trim() || undefined,
+      region: pendingValues.region,
       featureNames: pendingValues.featureNames,
       adminFirstName: pendingValues.adminFirstName,
       adminLastName: pendingValues.adminLastName,
@@ -154,6 +163,28 @@ export function ProvisionTenantForm() {
                   Address (optional)
                 </label>
                 <Input id="address" {...form.register("address")} />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="region" className="block text-sm font-medium text-foreground">
+                  Data region
+                </label>
+                <SelectField
+                  inputId="region"
+                  options={REGION_OPTIONS}
+                  value={REGION_OPTIONS.find((o) => o.value === form.watch("region")) ?? REGION_OPTIONS[0] ?? null}
+                  onChange={(opt) => {
+                    if (opt?.value === "IN" || opt?.value === "AU") {
+                      form.setValue("region", opt.value, { shouldValidate: true });
+                    }
+                  }}
+                  isSearchable={false}
+                />
+                <p className="text-xs text-muted">
+                  Primary residency / regulatory region for this workspace.
+                </p>
+                {form.formState.errors.region?.message && (
+                  <p className="text-xs text-danger">{form.formState.errors.region.message}</p>
+                )}
               </div>
             </div>
           </fieldset>

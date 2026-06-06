@@ -31,6 +31,7 @@ export type ProvisionTenantPayload = {
   tenantName: string;
   tenantSlug?: string;
   address?: string;
+  region?: "IN" | "AU";
   adminEmail: string;
   adminPassword: string;
   adminFirstName: string;

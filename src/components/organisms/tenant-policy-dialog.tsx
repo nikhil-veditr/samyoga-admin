@@ -200,8 +200,7 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
                       key={preset.days}
                       type="button"
                       variant="secondary"
-                      size="sm"
-                      className="h-8"
+                      className="h-8 px-2.5 py-1.5 text-xs"
                       onClick={() => setEnforceDateInput(enforceDateFromGraceDays(preset.days))}
                     >
                       {preset.label}

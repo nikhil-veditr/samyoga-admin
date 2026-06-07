@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
+import { AdminFeedbackRouteLink } from "@/components/organisms/admin-feedback-route-link";
 import {
   useInternalUserFeedbackQuery,
   useUpdateInternalUserFeedbackMutation,
@@ -50,9 +51,7 @@ function FeedbackRow({ item }: { item: InternalUserFeedbackItem }) {
       <td className="py-3 pr-4">
         <p className="font-medium text-foreground">{item.summary}</p>
         {item.details ? <p className="mt-1 text-xs text-muted">{item.details}</p> : null}
-        {route ? (
-          <p className="mt-1 font-mono text-[10px] text-muted">{route}</p>
-        ) : null}
+        {route ? <AdminFeedbackRouteLink route={route} /> : null}
       </td>
       <td className="py-3 pr-4 text-muted">
         <p>{item.tenantName}</p>

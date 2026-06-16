@@ -47,5 +47,6 @@ export function titleForAdminPath(pathname: string): string {
   if (pathname === "/tenants") return "Tenants";
   if (pathname.startsWith("/tenants/new")) return "Provision tenant";
   if (pathname === "/feedback") return "Feedback";
+  if (pathname === "/profile" || pathname.startsWith("/profile/")) return "Profile";
   return "Samyoga Admin";
 }

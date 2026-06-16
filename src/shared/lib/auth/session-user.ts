@@ -5,6 +5,8 @@ export type SessionUserLike = {
   firstName?: string | null;
   lastName?: string | null;
   superAdmin?: boolean;
+  /** Better Auth 2FA flag (set by the `two-factor` plugin). */
+  twoFactorEnabled?: boolean | null;
 };
 
 export function isSuperAdminUser(user: SessionUserLike | null | undefined): boolean {

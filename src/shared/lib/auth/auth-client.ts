@@ -1,6 +1,8 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
+import { twoFactorClient } from "better-auth/client/plugins";
+import { passkeyClient } from "@better-auth/passkey/client";
 import { betterAuthEnvelopeFetch } from "@/shared/lib/auth/envelope-fetch";
 import { getBetterAuthBrowserBaseUrl } from "@/shared/lib/auth/internal-api-url";
 
@@ -11,6 +13,10 @@ import { getBetterAuthBrowserBaseUrl } from "@/shared/lib/auth/internal-api-url"
  */
 export const authClient = createAuthClient({
   baseURL: getBetterAuthBrowserBaseUrl(),
+  plugins: [
+    twoFactorClient(),
+    passkeyClient(),
+  ],
   fetchOptions: {
     customFetchImpl: betterAuthEnvelopeFetch,
   },

@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import { AdminCapabilitiesPanel } from "@/components/organisms/app-shell/admin-capabilities-panel";
 import { AdminHeader } from "@/components/organisms/app-shell/admin-header";
 import { AdminSidebar } from "@/components/organisms/app-shell/admin-sidebar";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const reducedMotion = useReducedMotion();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
@@ -19,21 +23,41 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative flex min-h-screen bg-background">
-      {mobileNavOpen ? (
-        <button
-          type="button"
-          className="fixed inset-0 z-40 bg-black/40 md:hidden"
-          aria-label="Close navigation overlay"
-          onClick={() => setMobileNavOpen(false)}
-        />
-      ) : null}
+      <AnimatePresence>
+        {mobileNavOpen ? (
+          <m.button
+            key="nav-overlay"
+            type="button"
+            className="fixed inset-0 z-40 bg-black/40 md:hidden"
+            aria-label="Close navigation overlay"
+            onClick={() => setMobileNavOpen(false)}
+            initial={reducedMotion ? undefined : { opacity: 0 }}
+            animate={reducedMotion ? undefined : { opacity: 1 }}
+            exit={reducedMotion ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          />
+        ) : null}
+      </AnimatePresence>
 
       <AdminSidebar mobileOpen={mobileNavOpen} onCloseMobile={() => setMobileNavOpen(false)} />
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <AdminHeader mobileNavOpen={mobileNavOpen} onOpenMobileSidebar={() => setMobileNavOpen(true)} />
         <div className="flex min-h-0 flex-1">
-          <main className="app-scroll min-h-0 min-w-0 flex-1 p-4 md:p-6">{children}</main>
+          <LazyMotion features={domAnimation}>
+            <AnimatePresence mode="wait" initial={false}>
+              <m.main
+                key={pathname}
+                className="app-scroll min-h-0 min-w-0 flex-1 p-4 md:p-6"
+                initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
+                animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+                exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+              >
+                {children}
+              </m.main>
+            </AnimatePresence>
+          </LazyMotion>
           <aside className="app-scroll-y hidden w-72 shrink-0 border-l border-border bg-card/40 p-4 xl:block">
             <AdminCapabilitiesPanel variant="rail" />
           </aside>

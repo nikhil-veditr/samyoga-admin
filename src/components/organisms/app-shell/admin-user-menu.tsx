@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import { Avatar } from "@/components/atoms/avatar";
 import {
   DropdownChevron,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItemDanger,
+  DropdownMenuLink,
   DropdownMenuTrigger,
   useDropdownMenuContext,
 } from "@/components/atoms/dropdown-menu";
@@ -30,6 +31,17 @@ function SignOutItem({ onRequestSignOut }: { onRequestSignOut: () => void }) {
       <LogOut className="mr-2 h-4 w-4" />
       Sign out
     </DropdownMenuItemDanger>
+  );
+}
+
+function ProfileLinkItem() {
+  const { setOpen } = useDropdownMenuContext();
+
+  return (
+    <DropdownMenuLink href="/profile" onClick={() => setOpen(false)}>
+      <UserRound className="mr-2 h-4 w-4" />
+      Profile &amp; security
+    </DropdownMenuLink>
   );
 }
 
@@ -69,6 +81,7 @@ export function AdminUserMenu() {
             <p className="truncate text-sm font-medium text-foreground">{name}</p>
             <p className="text-xs text-muted">Super admin</p>
           </div>
+          <ProfileLinkItem />
           <SignOutItem onRequestSignOut={() => setConfirmOpen(true)} />
         </DropdownMenuContent>
       </DropdownMenu>

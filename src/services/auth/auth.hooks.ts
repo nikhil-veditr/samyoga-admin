@@ -30,8 +30,43 @@ export const useSignInMutation = () => {
 
       return result.data;
     },
+    onSuccess: (data) => {
+      // When 2FA is required, Better Auth returns `{ twoFactorRedirect: true }`
+      // and handles the redirect to `/two-factor`.
+      if (!data || !("twoFactorRedirect" in data) || data.twoFactorRedirect !== true) {
+        toast.success("Signed in");
+      }
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+};
+
+export type ChangePasswordPayload = {
+  currentPassword: string;
+  newPassword: string;
+  revokeOtherSessions: boolean;
+};
+
+export const useChangePasswordMutation = () => {
+  return useAppMutation({
+    mutationKey: ["auth", "change-password"],
+    mutationFn: async (payload: ChangePasswordPayload) => {
+      const result = await authClient.changePassword({
+        currentPassword: payload.currentPassword,
+        newPassword: payload.newPassword,
+        revokeOtherSessions: payload.revokeOtherSessions,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message ?? "Could not change password");
+      }
+
+      return result.data;
+    },
     onSuccess: () => {
-      toast.success("Signed in");
+      toast.success("Password updated");
     },
     onError: (err: Error) => {
       toast.error(err.message);

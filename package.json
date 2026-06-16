@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.6.5",
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.100.9",
     "better-auth": "^1.6.9",
@@ -16,7 +17,9 @@
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^1.14.0",
+    "motion": "^12.40.0",
     "next": "16.2.6",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-day-picker": "^10.0.0",
     "react-dom": "19.2.4",

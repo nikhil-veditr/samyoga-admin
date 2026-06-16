@@ -56,6 +56,8 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
 
   useEffect(() => {
     if (data?.settings) {
+      // Initializing local draft state from fetched async data is intentional here.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDraft(data.settings);
       setEnforceDateInput(toDateInputValue(data.settings.requireTwoFactorEnforceAt));
     }

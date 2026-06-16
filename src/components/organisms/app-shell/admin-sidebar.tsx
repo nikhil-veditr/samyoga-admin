@@ -7,6 +7,7 @@ import { ADMIN_NAV_ITEMS } from "@/shared/config/admin-nav";
 import { AdminCapabilitiesPanel } from "@/components/organisms/app-shell/admin-capabilities-panel";
 import { SamyogaLogoMark } from "@/components/atoms/samyoga-logo";
 import { ThemeCycleControl } from "@/components/molecules/theme-cycle-control";
+import { LayoutGroup, LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 
 type AdminSidebarProps = {
   mobileOpen: boolean;
@@ -22,6 +23,7 @@ function linkActive(pathname: string, href: string): boolean {
 
 export function AdminSidebar({ mobileOpen, onCloseMobile }: AdminSidebarProps) {
   const pathname = usePathname();
+  const reducedMotion = useReducedMotion();
 
   return (
     <aside
@@ -48,32 +50,44 @@ export function AdminSidebar({ mobileOpen, onCloseMobile }: AdminSidebarProps) {
         </button>
       </div>
 
-      <nav className="app-scroll-y flex flex-1 flex-col gap-1 p-3" aria-label="Admin navigation">
-        {ADMIN_NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const active = linkActive(pathname, item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => onCloseMobile()}
-              className={`flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                active
-                  ? "bg-primary/15 text-primary ring-1 ring-primary/25"
-                  : "text-foreground/80 hover:bg-card hover:text-foreground"
-              }`}
-            >
-              <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              <span className="min-w-0">
-                <span className="block font-medium">{item.label}</span>
-                {item.description ? (
-                  <span className="mt-0.5 block text-xs text-muted">{item.description}</span>
-                ) : null}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
+      <LazyMotion features={domAnimation}>
+        <LayoutGroup id="admin-sidebar-nav">
+          <nav className="app-scroll-y flex flex-1 flex-col gap-1 p-3" aria-label="Admin navigation">
+            {ADMIN_NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const active = linkActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => onCloseMobile()}
+                  className={`relative flex items-start gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm transition ${
+                    active
+                      ? "text-primary"
+                      : "text-foreground/80 hover:bg-card hover:text-foreground"
+                  }`}
+                >
+                  {active ? (
+                    <m.span
+                      layoutId="admin-sidebar-active-bg"
+                      aria-hidden
+                      className="absolute inset-0 -z-10 rounded-lg bg-primary/15 ring-1 ring-primary/25"
+                      transition={reducedMotion ? undefined : { duration: 0.2 }}
+                    />
+                  ) : null}
+                  <Icon className="relative mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                  <span className="min-w-0">
+                    <span className="block font-medium">{item.label}</span>
+                    {item.description ? (
+                      <span className="mt-0.5 block text-xs text-muted">{item.description}</span>
+                    ) : null}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        </LayoutGroup>
+      </LazyMotion>
 
       <div className="xl:hidden">
         <AdminCapabilitiesPanel variant="sidebar" onNavigate={onCloseMobile} />

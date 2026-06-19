@@ -57,7 +57,7 @@ function AdminProfilePageContent() {
     passkeyCount: number;
   } | null>(null);
 
-  // Poll strong-auth status when in setup mode so the Continue button appears after enabling MFA/passkey.
+  // Refresh strong-auth status so setup banners and Continue appear after enabling MFA/passkey.
   useEffect(() => {
     let cancelled = false;
     const refresh = async (): Promise<void> => {
@@ -65,13 +65,12 @@ function AdminProfilePageContent() {
       if (!cancelled) setStrongAuth(status);
     };
     void refresh();
-    if (!setupMode) return () => { cancelled = true; };
     const id = window.setInterval(() => void refresh(), 2_000);
     return () => {
       cancelled = true;
       window.clearInterval(id);
     };
-  }, [setupMode, sessionUser?.twoFactorEnabled]);
+  }, [sessionUser?.twoFactorEnabled]);
 
   const compliant = strongAuth ? meetsAdminStrongAuth(strongAuth) : false;
 
@@ -96,7 +95,7 @@ function AdminProfilePageContent() {
         <p className="mt-2 text-xs text-muted">Super admin · platform operator</p>
       </div>
 
-      {setupMode && !compliant ? (
+      {!compliant ? (
         <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-700 dark:text-amber-300" aria-hidden />

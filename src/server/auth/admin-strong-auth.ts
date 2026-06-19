@@ -44,10 +44,11 @@ export async function getAdminStrongAuthCompliance(request: NextRequest): Promis
 
   const twoFactorEnabled =
     user && typeof user === "object" && (user as SessionUserWithMfa).twoFactorEnabled === true;
-  if (twoFactorEnabled) {
+
+  const passkeyCount = await fetchPasskeyCount(request);
+  if (twoFactorEnabled || passkeyCount > 0) {
     return { hasSession, superAdmin, compliant: true };
   }
 
-  const passkeyCount = await fetchPasskeyCount(request);
-  return { hasSession, superAdmin, compliant: passkeyCount > 0 };
+  return { hasSession, superAdmin, compliant: false };
 }

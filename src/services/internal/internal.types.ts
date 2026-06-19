@@ -4,6 +4,11 @@ export type InternalTenantSummary = {
   slug: string;
   status: string;
   region: "IN" | "AU";
+  subscriptionTier: string;
+  tierSlug: string | null;
+  subscriptionStatus: string | null;
+  trialEndsAt: string | null;
+  isLifetimeFree: boolean;
 };
 
 export type InternalTenantFeature = CatalogFeature & {

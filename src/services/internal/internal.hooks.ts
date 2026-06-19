@@ -13,6 +13,7 @@ import {
   fetchPlatformFeatures,
   provisionInternalTenant,
   updateInternalTenantFeatures,
+  updateInternalTenantLifetimeFree,
   updateInternalTenantSettings,
   updateInternalTenantStatus,
   updateInternalUserFeedback,
@@ -150,6 +151,32 @@ export function useUpdateInternalTenantSettingsMutation() {
     }) => updateInternalTenantSettings(tenantId, body),
     onSuccess: async (_data, { tenantId }) => {
       await queryClient.invalidateQueries({ queryKey: internalTenantSettingsQueryKey(tenantId) });
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+}
+
+export function useUpdateTenantLifetimeFreeMutation() {
+  return useAppMutation({
+    mutationKey: ["internal", "tenants", "lifetime-free"],
+    mutationFn: ({
+      tenantId,
+      enabled,
+      tierSlug,
+    }: {
+      tenantId: string;
+      enabled: boolean;
+      tierSlug?: string;
+    }) => updateInternalTenantLifetimeFree(tenantId, { enabled, tierSlug }),
+    onSuccess: async (_data, { enabled }) => {
+      await queryClient.invalidateQueries({ queryKey: internalTenantsQueryKey });
+      toast.success(
+        enabled
+          ? "Lifetime complimentary access granted"
+          : "Lifetime complimentary access removed",
+      );
     },
     onError: (err: Error) => {
       toast.error(err.message);

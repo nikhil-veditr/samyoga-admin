@@ -9,10 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@better-auth/passkey": "^1.6.5",
+    "@better-auth/passkey": "1.6.13",
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.100.9",
-    "better-auth": "^1.6.9",
+    "better-auth": "1.6.13",
     "date-fns": "^4.1.0",
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",

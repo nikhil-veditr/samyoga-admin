@@ -7,6 +7,7 @@ import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { TenantFeaturesDialog } from "@/components/organisms/tenant-features-dialog";
+import { TenantBillingDialog } from "@/components/organisms/tenant-billing-dialog";
 import { TenantPolicyDialog } from "@/components/organisms/tenant-policy-dialog";
 import {
   useInternalTenantsQuery,
@@ -25,6 +26,7 @@ export function TenantsPanel() {
   const [pending, setPending] = useState<PendingTenantStatus | null>(null);
   const [featuresTenant, setFeaturesTenant] = useState<InternalTenantSummary | null>(null);
   const [policyTenant, setPolicyTenant] = useState<InternalTenantSummary | null>(null);
+  const [billingTenant, setBillingTenant] = useState<InternalTenantSummary | null>(null);
 
   const closeDialog = (): void => {
     if (!updateStatus.isPending) setPending(null);
@@ -69,6 +71,7 @@ export function TenantsPanel() {
                   <th className="py-2 pr-4 font-medium">Name</th>
                   <th className="py-2 pr-4 font-medium">Slug</th>
                   <th className="py-2 pr-4 font-medium">Region</th>
+                  <th className="py-2 pr-4 font-medium">Plan</th>
                   <th className="py-2 pr-4 font-medium">Status</th>
                   <th className="py-2 font-medium">Actions</th>
                 </tr>
@@ -81,6 +84,13 @@ export function TenantsPanel() {
                       <td className="py-3 pr-4 font-medium text-foreground">{t.name}</td>
                       <td className="py-3 pr-4 font-mono text-xs text-muted">{t.slug}</td>
                       <td className="py-3 pr-4 text-muted">{t.region === "AU" ? "Australia" : "India"}</td>
+                      <td className="py-3 pr-4 text-muted">
+                        <span className="capitalize">
+                          {t.isLifetimeFree
+                            ? `${t.tierSlug ?? t.subscriptionTier.toLowerCase()} · free`
+                            : t.tierSlug ?? t.subscriptionTier.toLowerCase()}
+                        </span>
+                      </td>
                       <td className="py-3 pr-4">
                         <span
                           className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
@@ -109,6 +119,15 @@ export function TenantsPanel() {
                             onClick={() => setPolicyTenant(t)}
                           >
                             Policy
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="px-3 py-1 text-xs"
+                            disabled={updateStatus.isPending}
+                            onClick={() => setBillingTenant(t)}
+                          >
+                            Billing
                           </Button>
                           {active ? (
                             <Button
@@ -176,6 +195,14 @@ export function TenantsPanel() {
         open={policyTenant != null}
         onOpenChange={(open) => {
           if (!open) setPolicyTenant(null);
+        }}
+      />
+
+      <TenantBillingDialog
+        tenant={billingTenant}
+        open={billingTenant != null}
+        onOpenChange={(open) => {
+          if (!open) setBillingTenant(null);
         }}
       />
 

@@ -110,6 +110,19 @@ export async function updateInternalTenantSettings(
   return data;
 }
 
+export async function updateInternalTenantLifetimeFree(
+  tenantId: string,
+  body: { enabled: boolean; tierSlug?: string },
+): Promise<{ enabled: boolean }> {
+  const data = await fetchClient<{ enabled: boolean }>({
+    endpoint: `/internal/tenants/${encodeURIComponent(tenantId)}/lifetime-free`,
+    method: "PATCH",
+    body,
+  });
+  if (!data) throw new Error("Failed to update lifetime complimentary access");
+  return data;
+}
+
 export async function provisionInternalTenant(
   body: ProvisionTenantPayload,
 ): Promise<ProvisionTenantResult> {

@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getAdminStrongAuthCompliance } from "@/server/auth/admin-strong-auth";
-import { adminSecuritySetupPath } from "@/shared/lib/auth/admin-strong-auth-policy";
 import { isSuperAdminUser } from "@/shared/lib/auth/session-user";
 import { getBetterAuthSession } from "@/server/auth/get-session";
 
@@ -43,22 +41,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/forbidden", request.url));
   }
 
-  if (session && superAdmin) {
-    const { compliant } = await getAdminStrongAuthCompliance(request);
-    const onSecuritySetupPage = isSecuritySetupPath(pathname);
-
-    if (!compliant && !onSecuritySetupPage) {
-      const next = pathname + request.nextUrl.search;
-      const setupPath = adminSecuritySetupPath(next === "/" ? null : next);
-      const url = new URL(setupPath.split("#")[0] ?? "/profile", request.url);
-      const hash = setupPath.includes("#") ? setupPath.split("#")[1] : undefined;
-      if (hash) url.hash = hash;
-      return NextResponse.redirect(url);
-    }
-
-    if (compliant && isPublicPath(pathname) && pathname !== "/forbidden") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (session && superAdmin && isPublicPath(pathname) && pathname !== "/forbidden") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
+import { AdminStrongAuthBanner } from "@/components/molecules/admin-strong-auth-banner";
 import { AdminCapabilitiesPanel } from "@/components/organisms/app-shell/admin-capabilities-panel";
 import { AdminHeader } from "@/components/organisms/app-shell/admin-header";
 import { AdminSidebar } from "@/components/organisms/app-shell/admin-sidebar";
@@ -43,6 +44,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <AdminHeader mobileNavOpen={mobileNavOpen} onOpenMobileSidebar={() => setMobileNavOpen(true)} />
+        <AdminStrongAuthBanner />
         <div className="flex min-h-0 flex-1">
           <LazyMotion features={domAnimation}>
             <AnimatePresence mode="wait" initial={false}>

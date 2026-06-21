@@ -34,7 +34,7 @@ export function TenantFeaturesDialog({ tenant, open, onOpenChange }: TenantFeatu
 
   const [draft, setDraft] = useState<Record<string, boolean>>({});
 
-  const features = data?.features ?? [];
+  const features = useMemo(() => data?.features ?? [], [data?.features]);
   const merged = useMemo(() => {
     return features.map((f) => ({
       ...f,

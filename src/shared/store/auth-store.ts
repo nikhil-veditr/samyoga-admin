@@ -45,7 +45,8 @@ export const useAuthStore = create<AuthState>()(
       merge: (persistedState, currentState) => {
         const raw = persistedState as Partial<AuthState> & { accessToken?: unknown } | undefined;
         if (!raw || typeof raw !== "object") return currentState;
-        const { accessToken: _drop, ...rest } = raw as Record<string, unknown>;
+        const rest = { ...(raw as Record<string, unknown>) };
+        delete rest.accessToken;
         return { ...currentState, ...rest } as AuthState;
       },
     },

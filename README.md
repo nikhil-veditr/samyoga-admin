@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Samyoga Admin
 
-## Getting Started
+Next.js **platform super-admin** console for Samyoga operators — tenant provisioning, feature catalog, internal feedback triage, and admin profile/security. Separate app and auth session from the HMS staff portal ([samyoga-fe-core](../samyoga-fe-core)).
 
-First, run the development server:
+## Samyoga repos
+
+| Repo | Role | Local port |
+|------|------|------------|
+| [samyoga-be](../samyoga-be) | REST API + Better Auth | `3000` |
+| [samyoga-fe-core](../samyoga-fe-core) | HMS portal (tenant staff) | `3002` |
+| **samyoga-admin** (this) | Platform super-admin | `3003` |
+| [samyoga-fe](../samyoga-fe) | Marketing site | `3004` |
+
+## What this app does
+
+| Area | Routes | Backend |
+|------|--------|---------|
+| Dashboard | `/` | Internal APIs |
+| Tenants | `/tenants`, `/tenants/new` | `POST/GET /api/v1/internal/...` |
+| Feature catalog | `/features` | Plan / feature management |
+| Feedback triage | `/feedback` | `GET /api/v1/internal/feedback` (from HMS user reports) |
+| Profile / security | `/profile` | Better Auth admin session |
+| Sign-in | `/signin`, `/two-factor` | `/api/v1/internal-auth` |
+
+Only **`superAdmin`** (or equivalent internal roles) should use this app. HMS tenant admins use **fe-core**, not admin.
+
+## Stack
+
+- Next.js 16 App Router, React 19, TypeScript
+- Tailwind CSS v4, TanStack Query, Zustand, React Hook Form
+- Better Auth (admin cookie prefix — separate from HMS sessions)
+
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn install
+cp .env.example .env
+yarn dev    # http://localhost:3003
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Backend required:** [samyoga-be](../samyoga-be) with:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `ADMIN_PORTAL_ORIGINS=http://localhost:3003` (or your admin URL)
+- A seeded super-admin user (`yarn db:seed_dev`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Do not set `NEXT_PUBLIC_API_DOMAIN` for local dev** unless you understand cross-origin cookies — session cookies are on `localhost:3003`; the default server proxy via `INTERNAL_API_URL` is the supported path.
 
-## Learn More
+## How it talks to the API
 
-To learn more about Next.js, take a look at the following resources:
+- **Auth:** Better Auth at `/api/v1/internal-auth` (proxied or direct to Express)
+- **Data:** Server-side calls to `INTERNAL_API_URL` + `/api/v1/internal/*` routes
+- **No `x-tenant-id`:** admin APIs are platform-scoped, not hospital-scoped
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+HMS deep links (e.g. open a captured feedback route in fe-core) use optional `NEXT_PUBLIC_HMS_APP_URL` (default `http://localhost:3002`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment
 
-## Deploy on Vercel
+Copy [`.env.example`](.env.example) → `.env`:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Purpose |
+|----------|---------|
+| `INTERNAL_API_URL` | Express API (default `http://127.0.0.1:3000`) |
+| `NEXT_PUBLIC_SITE_URL` | This app origin (`http://localhost:3003`) |
+| `NEXT_PUBLIC_HMS_APP_URL` | Link out to HMS for feedback context |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Backend must list this origin in `ADMIN_PORTAL_ORIGINS`.
+
+## Scripts
+
+```bash
+yarn dev      # port 3003
+yarn build
+yarn start
+yarn lint
+```
+
+## Related docs
+
+- [samyoga-be README](../samyoga-be/README.md) — API modules, `internal` routes, admin auth
+- [samyoga-be/docs/ROADMAP.md](../samyoga-be/docs/ROADMAP.md) — platform vs tenant features

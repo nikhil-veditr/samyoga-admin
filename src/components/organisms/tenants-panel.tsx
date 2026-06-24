@@ -9,6 +9,7 @@ import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { TenantFeaturesDialog } from "@/components/organisms/tenant-features-dialog";
 import { TenantBillingDialog } from "@/components/organisms/tenant-billing-dialog";
 import { TenantPolicyDialog } from "@/components/organisms/tenant-policy-dialog";
+import { QueryLoadError } from "@/components/molecules/query-load-error";
 import {
   useInternalTenantsQuery,
   useUpdateTenantStatusMutation,
@@ -21,7 +22,7 @@ type PendingTenantStatus = {
 };
 
 export function TenantsPanel() {
-  const { data: tenants, isPending } = useInternalTenantsQuery();
+  const { data: tenants, isPending, isError, refetch } = useInternalTenantsQuery();
   const updateStatus = useUpdateTenantStatusMutation();
   const [pending, setPending] = useState<PendingTenantStatus | null>(null);
   const [featuresTenant, setFeaturesTenant] = useState<InternalTenantSummary | null>(null);
@@ -63,6 +64,8 @@ export function TenantsPanel() {
         </div>
         {isPending ? (
           <p className="text-sm text-muted">Loading tenants…</p>
+        ) : isError ? (
+          <QueryLoadError message="Could not load tenants." onRetry={() => void refetch()} />
         ) : tenants && tenants.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">

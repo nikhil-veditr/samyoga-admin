@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
+import { QueryLoadError } from "@/components/molecules/query-load-error";
 import {
   FEATURE_LABELS,
   type CatalogFeatureName,
@@ -25,7 +26,7 @@ function featureLabel(name: string): string {
 }
 
 export function PlatformFeaturesPanel() {
-  const { data: features, isPending } = usePlatformFeaturesQuery();
+  const { data: features, isPending, isError, refetch } = usePlatformFeaturesQuery();
   const updateFeature = useUpdatePlatformFeatureMutation();
   const [pending, setPending] = useState<PendingToggle | null>(null);
 
@@ -57,6 +58,8 @@ export function PlatformFeaturesPanel() {
         </div>
         {isPending ? (
           <p className="text-sm text-muted">Loading features…</p>
+        ) : isError ? (
+          <QueryLoadError message="Could not load platform features." onRetry={() => void refetch()} />
         ) : features && features.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">

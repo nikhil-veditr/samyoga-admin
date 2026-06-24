@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Building2, PlusCircle, Puzzle } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
+import { QueryLoadError } from "@/components/molecules/query-load-error";
 import { useAuthStore } from "@/shared/store/auth-store";
 import { useMyProfileQuery } from "@/services/me/me.hooks";
 import { useInternalTenantsQuery } from "@/services/internal/internal.hooks";
@@ -11,7 +12,8 @@ import { useInternalTenantsQuery } from "@/services/internal/internal.hooks";
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const { data: profile, isPending } = useMyProfileQuery();
-  const { data: tenants, isPending: tenantsPending } = useInternalTenantsQuery();
+  const { data: tenants, isPending: tenantsPending, isError: tenantsError, refetch: refetchTenants } =
+    useInternalTenantsQuery();
 
   const displayName =
     [profile?.firstName ?? user?.firstName, profile?.lastName ?? user?.lastName].filter(Boolean).join(" ") ||
@@ -65,6 +67,8 @@ export default function DashboardPage() {
         </div>
         {tenantsPending ? (
           <p className="text-sm text-muted">Loading tenants…</p>
+        ) : tenantsError ? (
+          <QueryLoadError message="Could not load tenants." onRetry={() => void refetchTenants()} />
         ) : tenants && tenants.length > 0 ? (
           <ul className="divide-y divide-border">
             {tenants.slice(0, 5).map((t) => (

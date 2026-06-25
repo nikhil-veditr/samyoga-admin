@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
+import { QueryLoadError } from "@/components/molecules/query-load-error";
 import { AdminFeedbackRouteLink } from "@/components/organisms/admin-feedback-route-link";
 import {
   useInternalUserFeedbackQuery,
@@ -117,7 +118,7 @@ export function FeedbackPanel() {
     [statusFilter, page],
   );
 
-  const { data, isPending } = useInternalUserFeedbackQuery(filters);
+  const { data, isPending, isError, refetch } = useInternalUserFeedbackQuery(filters);
   const items = data?.items ?? [];
   const pagination = data?.pagination;
 
@@ -154,6 +155,8 @@ export function FeedbackPanel() {
 
       {isPending ? (
         <p className="text-sm text-muted">Loading feedback…</p>
+      ) : isError ? (
+        <QueryLoadError message="Could not load feedback." onRetry={() => void refetch()} />
       ) : items.length === 0 ? (
         <p className="text-sm text-muted">No feedback items for this filter.</p>
       ) : (

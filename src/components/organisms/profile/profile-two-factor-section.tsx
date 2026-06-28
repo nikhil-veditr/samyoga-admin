@@ -4,6 +4,7 @@ import { Check, Copy, Download, Loader2, RefreshCw, ShieldCheck } from "lucide-r
 import { QRCodeCanvas } from "qrcode.react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { AdminSurface } from "@/components/atoms/admin-surface";
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
 import { Input } from "@/components/atoms/input";
@@ -235,12 +236,9 @@ export function ProfileTwoFactorSection() {
   };
 
   return (
-    <section
-      id={PROFILE_TWO_FACTOR_SECTION_ID}
-      className="scroll-mt-6 rounded-xl border border-border/70 bg-card/60 p-5 shadow-sm"
-    >
+    <AdminSurface as="section" id={PROFILE_TWO_FACTOR_SECTION_ID} className="scroll-mt-6 p-5">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12 text-primary">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/15 text-secondary">
           <ShieldCheck className="h-5 w-5" aria-hidden />
         </div>
         <div className="min-w-0 flex-1 space-y-3">
@@ -422,6 +420,6 @@ export function ProfileTwoFactorSection() {
         pending={busy}
         onConfirm={regenerateBackupCodes}
       />
-    </section>
+    </AdminSurface>
   );
 }

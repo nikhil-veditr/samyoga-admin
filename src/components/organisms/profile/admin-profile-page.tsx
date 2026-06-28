@@ -2,8 +2,11 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, ShieldCheck, UserRound } from "lucide-react";
+import { Shield, ShieldCheck, UserRound } from "lucide-react";
+import { AdminSurface } from "@/components/atoms/admin-surface";
 import { Button } from "@/components/atoms/button";
+import { Skeleton } from "@/components/atoms/skeleton";
+import { ProfilePageSkeleton } from "@/components/molecules/skeletons/admin-page-skeletons";
 import { ProfileChangePasswordSection } from "@/components/organisms/profile/profile-change-password-section";
 import { ProfilePasskeysSection } from "@/components/organisms/profile/profile-passkeys-section";
 import { PROFILE_SECURITY_SECTION_ID } from "@/components/organisms/profile/profile-passkeys.shared";
@@ -86,14 +89,19 @@ function AdminProfilePageContent() {
         </p>
       </header>
 
-      <div className="rounded-2xl border border-border/70 bg-card/40 p-5 shadow-sm">
+      <AdminSurface elevated className="p-5">
         <p className="text-sm text-muted">Signed in as</p>
-        <p className="mt-1 font-heading text-lg font-semibold text-foreground">
-          {profilePending && !profile ? "Loading…" : displayName}
-        </p>
+        {profilePending && !profile ? (
+          <Skeleton className="mt-2 h-7 w-48" />
+        ) : (
+          <p className="mt-1 font-heading text-lg font-semibold text-foreground">{displayName}</p>
+        )}
         {displayEmail ? <p className="mt-0.5 text-sm text-muted">{displayEmail}</p> : null}
-        <p className="mt-2 text-xs text-muted">Super admin · platform operator</p>
-      </div>
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
+          <Shield className="h-3 w-3 text-secondary" aria-hidden />
+          Super admin · platform operator
+        </p>
+      </AdminSurface>
 
       {!compliant ? (
         <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
@@ -149,14 +157,7 @@ function AdminProfilePageContent() {
 
 export function AdminProfilePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-[40vh] items-center justify-center gap-2 text-muted">
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-          <span className="text-sm">Loading profile…</span>
-        </div>
-      }
-    >
+    <Suspense fallback={<ProfilePageSkeleton />}>
       <AdminProfilePageContent />
     </Suspense>
   );

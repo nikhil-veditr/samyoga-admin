@@ -23,13 +23,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [mobileNavOpen]);
 
   return (
-    <div className="relative flex min-h-screen bg-background">
+    <div className="admin-shell relative flex bg-background">
       <AnimatePresence>
         {mobileNavOpen ? (
           <m.button
             key="nav-overlay"
             type="button"
-            className="fixed inset-0 z-40 bg-black/40 md:hidden"
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px] md:hidden"
             aria-label="Close navigation overlay"
             onClick={() => setMobileNavOpen(false)}
             initial={reducedMotion ? undefined : { opacity: 0 }}
@@ -42,15 +42,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <AdminSidebar mobileOpen={mobileNavOpen} onCloseMobile={() => setMobileNavOpen(false)} />
 
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <AdminHeader mobileNavOpen={mobileNavOpen} onOpenMobileSidebar={() => setMobileNavOpen(true)} />
         <AdminStrongAuthBanner />
-        <div className="flex min-h-0 flex-1">
+        <div className="flex min-h-0 flex-1 overflow-hidden">
           <LazyMotion features={domAnimation}>
             <AnimatePresence mode="wait" initial={false}>
               <m.main
                 key={pathname}
-                className="app-scroll min-h-0 min-w-0 flex-1 p-4 md:p-6"
+                className="admin-shell__main min-h-0 min-w-0 flex-1 p-4 md:p-6"
                 initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
                 animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
                 exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
@@ -60,7 +60,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </m.main>
             </AnimatePresence>
           </LazyMotion>
-          <aside className="app-scroll-y hidden w-72 shrink-0 border-l border-border bg-card/40 p-4 xl:block">
+          <aside className="app-scroll-y hidden w-72 shrink-0 border-l border-border/70 bg-card/30 p-4 backdrop-blur-sm xl:block">
             <AdminCapabilitiesPanel variant="rail" />
           </aside>
         </div>

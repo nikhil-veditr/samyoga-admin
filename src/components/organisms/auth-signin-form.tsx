@@ -6,7 +6,6 @@ import { Eye, EyeOff, Fingerprint, Loader2, LogIn, ShieldCheck } from "lucide-re
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Checkbox } from "@/components/atoms/checkbox";
-import { ThemeCycleControl } from "@/components/molecules/theme-cycle-control";
 import { authClient } from "@/shared/lib/auth/auth-client";
 import { isSuperAdminUser } from "@/shared/lib/auth/session-user";
 import { useSignInMutation } from "@/services/auth/auth.hooks";
@@ -177,19 +176,11 @@ export function AuthSignInForm() {
   return (
     <LazyMotion features={domAnimation}>
       <m.div
-        className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-sm"
-        initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
+        className="w-full"
+        initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
         animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.25 }}
       >
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <h2 className="font-heading text-xl font-semibold text-foreground">Sign in</h2>
-            <p className="mt-1 text-sm text-muted">Platform operators only</p>
-          </div>
-          <ThemeCycleControl />
-        </div>
-
         {needsTwoFactor ? (
           <div className="space-y-5">
             <div className="flex items-center gap-3">
@@ -313,7 +304,7 @@ export function AuthSignInForm() {
                   <span className="w-full border-t border-border/70" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase tracking-wide">
-                  <span className="bg-card px-2 text-muted">or</span>
+                  <span className="relative px-2 text-muted">or</span>
                 </div>
               </div>
             </div>

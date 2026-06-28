@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { adminSurfaceElevatedClass } from "@/components/atoms/admin-surface";
 
 export type TableCardProps = {
   children: ReactNode;
@@ -31,7 +32,7 @@ export function TableCard({
 
   return (
     <div
-      className={`overflow-hidden rounded-md border border-border bg-card ${shellClassName}`}
+      className={`overflow-hidden ${adminSurfaceElevatedClass} ${shellClassName}`}
     >
       <div className={bodyClass}>{children}</div>
       {footer}

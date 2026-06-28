@@ -1,15 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Puzzle } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { TableCard } from "@/components/atoms/table-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
-import { QueryLoadError } from "@/components/molecules/query-load-error";
+import { ListEmptyState } from "@/components/molecules/list-empty-state";
+import { ListPageHeaderActions } from "@/components/molecules/list-page-header-actions";
+import { ListPageRefreshButton } from "@/components/molecules/list-page-refresh-button";
+import { ListTableErrorRow } from "@/components/molecules/list-load-error-state";
+import { TableSkeleton } from "@/components/molecules/skeletons/table-skeleton";
 import {
   FEATURE_LABELS,
   type CatalogFeatureName,
 } from "@/shared/config/feature-labels";
+import { completeListRefresh } from "@/shared/lib/list-refresh-feedback";
+import {
+  resolveListRefreshButton,
+  resolveListTableLoading,
+} from "@/shared/lib/resolve-list-table-loading";
 import {
   usePlatformFeaturesQuery,
   useUpdatePlatformFeatureMutation,
@@ -26,9 +36,22 @@ function featureLabel(name: string): string {
 }
 
 export function PlatformFeaturesPanel() {
-  const { data: features, isPending, isError, refetch } = usePlatformFeaturesQuery();
+  const { data: features, isPending, isFetching, isError, refetch } = usePlatformFeaturesQuery();
   const updateFeature = useUpdatePlatformFeatureMutation();
   const [pending, setPending] = useState<PendingToggle | null>(null);
+
+  const rowCount = features?.length ?? 0;
+  const { controlsBusy, showInitialSkeleton, showEmptyState } = useMemo(
+    () =>
+      resolveListTableLoading({
+        isPending,
+        isFetching,
+        isError,
+        rowCount,
+      }),
+    [isPending, isFetching, isError, rowCount],
+  );
+  const refreshState = resolveListRefreshButton({ isPending, isFetching, isError });
 
   const closeDialog = (): void => {
     if (!updateFeature.isPending) setPending(null);
@@ -47,33 +70,62 @@ export function PlatformFeaturesPanel() {
   const enabling = pending != null && pending.nextActive;
 
   return (
-    <>
+    <div className="mx-auto max-w-6xl">
       <TableCard shellClassName="p-6">
-        <div className="mb-4">
-          <h2 className="font-heading text-lg font-semibold text-foreground">Platform features</h2>
-          <p className="mt-1 text-sm text-muted">
-            Disable a module to block all tenant HMS APIs that require it. Tenant provisioning only lists
-            active modules.
-          </p>
+        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h2 className="font-heading text-lg font-semibold text-foreground">Platform features</h2>
+            <p className="mt-1 text-sm text-muted">
+              Disable a module to block all tenant HMS APIs that require it. Tenant provisioning only lists
+              active modules.
+            </p>
+          </div>
+          <ListPageHeaderActions>
+            <ListPageRefreshButton
+              busy={refreshState.busy}
+              spinning={refreshState.spinning}
+              onClick={() =>
+                void completeListRefresh(refetch, {
+                  successMessage: "Features list updated",
+                  errorMessage: "Could not refresh features",
+                })
+              }
+            />
+          </ListPageHeaderActions>
         </div>
-        {isPending ? (
-          <p className="text-sm text-muted">Loading features…</p>
-        ) : isError ? (
-          <QueryLoadError message="Could not load platform features." onRetry={() => void refetch()} />
-        ) : features && features.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-border text-muted">
-                  <th className="py-2 pr-4 font-medium">Feature</th>
-                  <th className="py-2 pr-4 font-medium">Version</th>
-                  <th className="py-2 pr-4 font-medium">Tenants enabled</th>
-                  <th className="py-2 pr-4 font-medium">Status</th>
-                  <th className="py-2 font-medium">Action</th>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-border text-muted">
+                <th className="py-2 pr-4 font-medium">Feature</th>
+                <th className="py-2 pr-4 font-medium">Version</th>
+                <th className="py-2 pr-4 font-medium">Tenants enabled</th>
+                <th className="py-2 pr-4 font-medium">Status</th>
+                <th className="py-2 font-medium">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isError ? (
+                <ListTableErrorRow
+                  colSpan={5}
+                  message="Could not load platform features."
+                  onRetry={() => void refetch()}
+                />
+              ) : showInitialSkeleton ? (
+                <TableSkeleton rows={8} columns={5} asTableRows />
+              ) : showEmptyState ? (
+                <tr>
+                  <td colSpan={5} className="p-0">
+                    <ListEmptyState
+                      icon={Puzzle}
+                      title="No features in catalog"
+                      description="Run the database seed to populate the platform feature catalog."
+                    />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {features.map((feature) => (
+              ) : (
+                features?.map((feature) => (
                   <tr key={feature.name} className="border-b border-border/60 last:border-0">
                     <td className="py-3 pr-4">
                       <span className="block font-medium text-foreground">{featureLabel(feature.name)}</span>
@@ -85,7 +137,7 @@ export function PlatformFeaturesPanel() {
                     <td className="py-3 pr-4 text-muted">{feature.enabledTenantCount}</td>
                     <td className="py-3 pr-4">
                       <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium transition ${
                           feature.isActive
                             ? "bg-primary/15 text-primary"
                             : "bg-danger/10 text-danger"
@@ -100,7 +152,7 @@ export function PlatformFeaturesPanel() {
                           type="button"
                           variant="danger"
                           className="px-3 py-1 text-xs"
-                          disabled={updateFeature.isPending}
+                          disabled={controlsBusy || updateFeature.isPending}
                           onClick={() => setPending({ feature, nextActive: false })}
                         >
                           Disable
@@ -110,7 +162,7 @@ export function PlatformFeaturesPanel() {
                           type="button"
                           variant="ghost"
                           className="px-3 py-1 text-xs"
-                          disabled={updateFeature.isPending}
+                          disabled={controlsBusy || updateFeature.isPending}
                           onClick={() => setPending({ feature, nextActive: true })}
                         >
                           Enable
@@ -118,13 +170,11 @@ export function PlatformFeaturesPanel() {
                       )}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="text-sm text-muted">No features in catalog. Run database seed.</p>
-        )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </TableCard>
 
       <ConfirmDialog
@@ -172,6 +222,6 @@ export function PlatformFeaturesPanel() {
         confirmFieldKey={pending?.feature.name}
         onConfirm={confirmToggle}
       />
-    </>
+    </div>
   );
 }

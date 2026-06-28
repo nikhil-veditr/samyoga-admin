@@ -11,6 +11,7 @@ import { SelectField, type SelectOption } from "@/components/atoms/select-field"
 import { InlineFeedback } from "@/components/atoms/inline-feedback";
 import { TableCard } from "@/components/atoms/table-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
+import { TableSkeleton } from "@/components/molecules/skeletons/table-skeleton";
 import {
   DEFAULT_PROVISION_FEATURES,
   FEATURE_LABELS,
@@ -126,7 +127,7 @@ export function ProvisionTenantForm() {
   const confirmMatch = pendingValues?.tenantName.trim() ?? "";
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h1 className="font-heading text-xl font-semibold text-foreground">Provision new tenant</h1>
         <p className="mt-1 text-sm text-muted">
@@ -136,8 +137,8 @@ export function ProvisionTenantForm() {
       </div>
 
       <TableCard shellClassName="p-6">
-        <form onSubmit={onSubmit} className="space-y-6">
-          <fieldset className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-8">
+          <fieldset className="space-y-4 rounded-2xl border border-border/60 bg-background/30 p-5">
             <legend className="text-xs font-medium uppercase tracking-wide text-muted">Hospital</legend>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5 sm:col-span-2">
@@ -189,7 +190,7 @@ export function ProvisionTenantForm() {
             </div>
           </fieldset>
 
-          <fieldset className="space-y-3">
+          <fieldset className="space-y-3 rounded-2xl border border-border/60 bg-background/30 p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <legend className="text-xs font-medium uppercase tracking-wide text-muted">Features to enable</legend>
               <div className="flex gap-2">
@@ -209,9 +210,9 @@ export function ProvisionTenantForm() {
               <InlineFeedback variant="error">{form.formState.errors.featureNames.message}</InlineFeedback>
             )}
             {featuresLoading ? (
-              <p className="text-sm text-muted">Loading feature catalog…</p>
+              <TableSkeleton rows={6} className="py-1" />
             ) : (
-              <div className="grid gap-2 rounded-lg border border-border bg-background p-4 sm:grid-cols-2">
+              <div className="grid gap-2 rounded-xl border border-border/60 bg-card/40 p-4 sm:grid-cols-2">
                 {(catalogFeatures ?? []).map((feature) => {
                   const checked = selectedFeatures.includes(feature.name);
                   return (
@@ -233,7 +234,7 @@ export function ProvisionTenantForm() {
             <p className="text-xs text-muted">{selectedFeatures.length} feature(s) selected</p>
           </fieldset>
 
-          <fieldset className="space-y-4">
+          <fieldset className="space-y-4 rounded-2xl border border-border/60 bg-background/30 p-5">
             <legend className="text-xs font-medium uppercase tracking-wide text-muted">First admin user</legend>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">

@@ -3,6 +3,7 @@
 import { Fingerprint, KeyRound, Loader2, Trash2 } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
+import { AdminSurface } from "@/components/atoms/admin-surface";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
@@ -98,12 +99,13 @@ export function ProfilePasskeysSection() {
 
   return (
     <>
-      <section
+      <AdminSurface
+        as="section"
         id={PROFILE_PASSKEYS_SECTION_ID}
-        className="scroll-mt-6 rounded-xl border border-border/70 bg-card/60 p-5 shadow-sm"
+        className="scroll-mt-6 p-5"
       >
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/15 text-secondary">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/15 text-secondary">
             <Fingerprint className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0 flex-1 space-y-3">
@@ -189,7 +191,7 @@ export function ProfilePasskeysSection() {
             )}
           </div>
         </div>
-      </section>
+      </AdminSurface>
 
       <ConfirmDialog
         open={deleteTarget != null}

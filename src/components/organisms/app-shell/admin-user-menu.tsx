@@ -8,12 +8,20 @@ import {
   DropdownChevron,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItemDanger,
   DropdownMenuLink,
   DropdownMenuTrigger,
   useDropdownMenuContext,
 } from "@/components/atoms/dropdown-menu";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
+import {
+  adminAccountSwitcherChevronClass,
+  adminAccountSwitcherLabelClass,
+  adminAccountSwitcherMobileCompact,
+  adminAccountSwitcherNameClass,
+  adminAccountSwitcherTrigger,
+} from "@/components/organisms/app-shell/admin-header-switcher";
 import { signOutApp } from "@/services/auth/auth.hooks";
 import { useAuthStore } from "@/shared/store/auth-store";
 import { getUserInitials } from "@/shared/lib/user-display";
@@ -23,12 +31,13 @@ function SignOutItem({ onRequestSignOut }: { onRequestSignOut: () => void }) {
 
   return (
     <DropdownMenuItemDanger
+      className="w-full rounded-none"
       onClick={() => {
         setOpen(false);
         onRequestSignOut();
       }}
     >
-      <LogOut className="mr-2 h-4 w-4" />
+      <LogOut className="h-4 w-4" aria-hidden />
       Sign out
     </DropdownMenuItemDanger>
   );
@@ -38,9 +47,9 @@ function ProfileLinkItem() {
   const { setOpen } = useDropdownMenuContext();
 
   return (
-    <DropdownMenuLink href="/profile" onClick={() => setOpen(false)}>
-      <UserRound className="mr-2 h-4 w-4" />
-      Profile &amp; security
+    <DropdownMenuLink href="/profile" className="w-full rounded-none" onClick={() => setOpen(false)}>
+      <UserRound className="h-4 w-4 text-muted" aria-hidden />
+      Profile
     </DropdownMenuLink>
   );
 }
@@ -69,20 +78,38 @@ export function AdminUserMenu() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
+          aria-label={`Your account — ${name}`}
           aria-haspopup="menu"
-          className="flex items-center gap-2 rounded-lg border border-border bg-card py-1.5 pl-2 pr-2 hover:bg-background md:px-3"
+          className={`${adminAccountSwitcherTrigger} ${adminAccountSwitcherMobileCompact} relative`}
         >
-          <Avatar initials={initials} size="md" />
-          <span className="hidden max-w-[160px] truncate text-sm font-medium text-foreground sm:inline">{name}</span>
-          <DropdownChevron className="hidden h-4 w-4 text-muted sm:block" />
+          <Avatar initials={initials} size="sm" />
+          <span className="hidden min-w-0 max-w-[140px] flex-col justify-center leading-tight md:flex md:max-w-[180px]">
+            <span className={adminAccountSwitcherLabelClass}>Your account</span>
+            <span className={adminAccountSwitcherNameClass}>{name}</span>
+          </span>
+          <DropdownChevron className={`hidden ${adminAccountSwitcherChevronClass} md:block`} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <div className="border-b border-border px-3 py-2 sm:hidden">
-            <p className="truncate text-sm font-medium text-foreground">{name}</p>
-            <p className="text-xs text-muted">Super admin</p>
+
+        <DropdownMenuContent
+          portaled={true}
+          align="end"
+          className="w-[min(calc(100vw-2rem),260px)] overflow-hidden py-0"
+        >
+          <div className="border-b border-border/60 px-3 py-2.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Your account</p>
+            <div className="mt-2 flex min-w-0 items-center gap-3">
+              <Avatar initials={initials} size="md" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-foreground">{name}</p>
+                {user?.email ? <p className="truncate text-xs text-muted">{user.email}</p> : null}
+                <p className="mt-0.5 truncate text-xs text-secondary">Super admin</p>
+              </div>
+            </div>
           </div>
-          <ProfileLinkItem />
-          <SignOutItem onRequestSignOut={() => setConfirmOpen(true)} />
+          <DropdownMenuGroup label="Account" bordered>
+            <ProfileLinkItem />
+            <SignOutItem onRequestSignOut={() => setConfirmOpen(true)} />
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 

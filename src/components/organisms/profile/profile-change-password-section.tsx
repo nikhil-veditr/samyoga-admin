@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Eye, EyeOff, KeyRound, Loader2 } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { z } from "zod";
+import { AdminSurface } from "@/components/atoms/admin-surface";
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
 import { Input } from "@/components/atoms/input";
@@ -103,15 +104,14 @@ export function ProfileChangePasswordSection() {
   const { errors } = form.formState;
 
   return (
-    <section
-      id={PROFILE_PASSWORD_SECTION_ID}
-      className="scroll-mt-6 space-y-4 rounded-xl border border-border/70 bg-card/60 p-5 shadow-sm"
-    >
-      <div className="flex items-start gap-2">
-        <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Password</h2>
-          <p className="mt-0.5 text-xs text-muted">Enter your current password to set a new one.</p>
+    <AdminSurface as="section" id={PROFILE_PASSWORD_SECTION_ID} className="scroll-mt-6 space-y-4 p-5">
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary/15 text-secondary">
+          <KeyRound className="h-5 w-5" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-heading text-lg font-semibold text-foreground">Password</h2>
+          <p className="mt-1 text-sm text-muted">Enter your current password to set a new one.</p>
         </div>
       </div>
 
@@ -192,6 +192,6 @@ export function ProfileChangePasswordSection() {
           )}
         </Button>
       </form>
-    </section>
+    </AdminSurface>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { FormSectionSkeleton } from "@/components/molecules/skeletons/form-section-skeleton";
 import { toast } from "sonner";
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
@@ -116,7 +117,7 @@ export function TenantPolicyDialog({ tenant, open, onOpenChange }: TenantPolicyD
       }
     >
       {isPending ? (
-        <p className="text-sm text-muted">Loading policy…</p>
+        <FormSectionSkeleton fields={4} withTitle={false} />
       ) : isError || !draft ? (
         <p className="text-sm text-danger">Could not load tenant policy.</p>
       ) : (

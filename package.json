@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p 3003",
     "lint": "eslint",
-    "check": "yarn lint && yarn build"
+    "test": "vitest run",
+    "check": "yarn lint && yarn test && yarn build"
   },
   "dependencies": {
     "@better-auth/passkey": "1.6.13",
@@ -39,6 +40,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

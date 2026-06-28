@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "react-day-picker/style.css";
 
+/** App theme toggle sets `data-theme` on `<html>` — align `dark:` utilities with that, not OS preference alone. */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 :root {
   --background: #f4f7f4;
   --foreground: #141616;
@@ -13,6 +16,8 @@
   --secondary-foreground: #faf9f5;
   --danger: #b42318;
   --sidebar: #eef3ee;
+  --bezel-highlight: rgba(255, 255, 255, 0.65);
+  --bezel-shadow: rgba(20, 22, 20, 0.06);
 }
 
 @theme inline {
@@ -32,6 +37,9 @@
   --z-index-hint-tooltip: 10060;
   --z-index-select-menu: 10050;
   --z-index-dialog: 200;
+  --z-index-dialog-secondary: 195;
+  --z-index-sheet: 190;
+  --z-index-sheet-secondary: 185;
 }
 
 [data-theme="dark"] {
@@ -46,15 +54,16 @@
   --secondary-foreground: #1f1b0d;
   --danger: #f97066;
   --sidebar: #121814;
+  --bezel-highlight: rgba(255, 255, 255, 0.04);
+  --bezel-shadow: rgba(0, 0, 0, 0.45);
 }
 
 body {
   background-color: var(--background);
-  background-image: radial-gradient(
-    ellipse 120% 80% at 50% -20%,
-    color-mix(in srgb, var(--primary) 12%, transparent),
-    transparent
-  );
+  background-image:
+    radial-gradient(ellipse 130% 90% at 50% -35%, color-mix(in srgb, var(--primary) 14%, transparent), transparent),
+    radial-gradient(ellipse 70% 55% at 100% 20%, color-mix(in srgb, var(--secondary) 10%, transparent), transparent),
+    radial-gradient(ellipse 55% 45% at 0% 85%, color-mix(in srgb, var(--primary) 8%, transparent), transparent);
   color: var(--foreground);
 }
 
@@ -71,13 +80,130 @@ h6 {
   border-color: var(--border);
 }
 
+.logo-plate {
+  background-color: color-mix(in srgb, var(--background) 65%, var(--card) 35%);
+  background-image: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--border) 28%, transparent) 10%,
+      transparent 10%,
+      transparent 50%,
+      color-mix(in srgb, var(--border) 28%, transparent) 50%,
+      color-mix(in srgb, var(--border) 28%, transparent) 60%,
+      transparent 60%,
+      transparent 100%
+    );
+  background-size: 7px 7px;
+}
+
+[data-theme="dark"] .logo-plate {
+  background-color: color-mix(in srgb, var(--background) 55%, var(--card) 45%);
+}
+
+input[type="search"].input-search-cancel-themed::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-inline-end: 4px;
+  cursor: pointer;
+  background-color: color-mix(in srgb, var(--muted) 72%, var(--foreground) 28%);
+  opacity: 1;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E")
+    center / 16px 16px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E")
+    center / 16px 16px no-repeat;
+}
+
+input[type="search"].input-search-cancel-themed::-webkit-search-cancel-button:hover {
+  background-color: color-mix(in srgb, var(--muted) 40%, var(--foreground) 60%);
+}
+
+.scroll-themed-y,
+.app-scroll-y,
+.app-scroll,
+.app-scroll-x {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted) 58%, var(--primary) 12%) color-mix(in srgb, var(--border) 35%, transparent);
+}
+
+.scroll-themed-y::-webkit-scrollbar,
+.app-scroll-y::-webkit-scrollbar,
+.app-scroll::-webkit-scrollbar {
+  width: 9px;
+}
+
+.app-scroll-x::-webkit-scrollbar {
+  height: 9px;
+}
+
+.scroll-themed-y::-webkit-scrollbar-track,
+.app-scroll-y::-webkit-scrollbar-track,
+.app-scroll::-webkit-scrollbar-track {
+  margin-block: 6px;
+  background: color-mix(in srgb, var(--border) 22%, transparent);
+  border-radius: 9999px;
+}
+
+.app-scroll-x::-webkit-scrollbar-track {
+  margin-inline: 6px;
+  background: color-mix(in srgb, var(--border) 22%, transparent);
+  border-radius: 9999px;
+}
+
+.scroll-themed-y::-webkit-scrollbar-thumb,
+.app-scroll-y::-webkit-scrollbar-thumb,
+.app-scroll::-webkit-scrollbar-thumb,
+.app-scroll-x::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background-color: color-mix(in srgb, var(--muted) 55%, var(--primary) 18%);
+}
+
+.scroll-themed-y::-webkit-scrollbar-thumb:hover,
+.app-scroll-y::-webkit-scrollbar-thumb:hover,
+.app-scroll::-webkit-scrollbar-thumb:hover,
+.app-scroll-x::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--muted) 40%, var(--primary) 38%);
+}
+
 .app-scroll-y {
   overflow-y: auto;
   overflow-x: hidden;
 }
 
+.app-scroll-x {
+  overflow-x: auto;
+}
+
 .app-scroll {
   overflow: auto;
+}
+
+:root {
+  --portal-header-h: 3.5rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --portal-header-h: 4.25rem;
+  }
+}
+
+.portal-shell,
+.admin-shell {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.portal-shell__main,
+.admin-shell__main {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100dvh - var(--portal-header-h));
 }
 
 .date-picker-rdp .rdp-root {
@@ -86,4 +212,32 @@ h6 {
   --rdp-today-color: var(--primary);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   color: var(--foreground);
+}
+
+.admin-surface {
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background-color: color-mix(in srgb, var(--card) 40%, transparent);
+  box-shadow: 0 8px 32px -12px var(--bezel-shadow);
+  --tw-ring-color: var(--bezel-highlight);
+  box-shadow:
+    0 8px 32px -12px var(--bezel-shadow),
+    inset 0 0 0 1px var(--bezel-highlight);
+}
+
+.admin-surface-elevated {
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background-color: color-mix(in srgb, var(--card) 55%, transparent);
+  box-shadow:
+    0 8px 32px -12px var(--bezel-shadow),
+    inset 0 0 0 1px var(--bezel-highlight);
+}
+
+[data-theme="dark"] .admin-surface {
+  background-color: color-mix(in srgb, var(--card) 25%, transparent);
+}
+
+[data-theme="dark"] .admin-surface-elevated {
+  background-color: color-mix(in srgb, var(--card) 35%, transparent);
 }

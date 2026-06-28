@@ -2,6 +2,7 @@
 
 import { useId, useLayoutEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
 import { Modal } from "@/components/atoms/modal";
 
 function ConfirmNameMatchInput({
@@ -28,7 +29,7 @@ function ConfirmNameMatchInput({
       <label htmlFor={id} className="block text-xs font-medium text-foreground">
         Type <span className="font-mono text-foreground">{confirmNameMatch}</span> to confirm
       </label>
-      <input
+      <Input
         id={id}
         type="text"
         autoComplete="off"
@@ -39,7 +40,6 @@ function ConfirmNameMatchInput({
           onValidityChange(next.trim() === confirmNameMatch);
         }}
         disabled={disabled}
-        className="w-full rounded-lg border border-border/80 bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-primary/25 transition focus:border-primary/50 focus:ring-2 disabled:opacity-60"
         placeholder={confirmNameMatch}
       />
     </div>

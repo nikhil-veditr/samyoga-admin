@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { TableSkeleton } from "@/components/molecules/skeletons/table-skeleton";
 import { toast } from "sonner";
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
@@ -99,10 +99,7 @@ export function TenantFeaturesDialog({ tenant, open, onOpenChange }: TenantFeatu
       }
     >
       {isPending ? (
-        <div className="flex items-center gap-2 py-8 text-sm text-muted">
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-          Loading modules…
-        </div>
+        <TableSkeleton rows={6} className="py-2" />
       ) : isError ? (
         <p className="py-6 text-sm text-danger">Could not load tenant modules.</p>
       ) : merged.length === 0 ? (

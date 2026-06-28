@@ -10,6 +10,7 @@ import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from "
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
 import { Input } from "@/components/atoms/input";
+import { AuthFormSkeleton } from "@/components/molecules/skeletons/admin-page-skeletons";
 import { authClient } from "@/shared/lib/auth/auth-client";
 import { normalizeBackupCodeInput } from "@/shared/lib/auth/normalize-backup-code";
 import {
@@ -395,7 +396,7 @@ function TwoFactorClientPage() {
 
 export default function TwoFactorPage() {
   return (
-    <Suspense fallback={<div className="text-sm text-muted">Loading…</div>}>
+    <Suspense fallback={<AuthFormSkeleton />}>
       <TwoFactorClientPage />
     </Suspense>
   );
